@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker 完整教學 - Porsche哥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #00ffff;
+            text-decoration: none;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .article-header {
+            border-left: 4px solid #00ffff;
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .article-header h1 {
+            font-size: 2.5em;
+            color: #00ffff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            margin-bottom: 15px;
+        }
+        
+        .article-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .content h2 {
+            color: #ff00ff;
+            font-size: 1.6em;
+            margin: 30px 0 15px 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .content h2:first-child {
+            margin-top: 0;
+        }
+        
+        .content h3 {
+            color: #00ffff;
+            font-size: 1.3em;
+            margin: 25px 0 12px 0;
+        }
+        
+        .content p {
+            margin-bottom: 20px;
+            color: #a0a0a0;
+        }
+        
+        .content ul {
+            margin: 20px 0 20px 30px;
+            color: #a0a0a0;
+        }
+        
+        .content li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .tech-box {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-box p {
+            margin-bottom: 0;
+            color: #00ffff;
+        }
+        
+        .code-block {
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+        }
+        
+        .code-block .comment {
+            color: #666;
+        }
+        
+        .code-block .string {
+            color: #ff99ff;
+        }
+        
+        .code-block .keyword {
+            color: #00ffff;
+        }
+        
+        .code-block .command {
+            color: #ffff00;
+        }
+        
+        .warning-box {
+            background: rgba(255, 100, 100, 0.1);
+            border: 1px solid #ff6666;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .warning-box p {
+            color: #ff9999;
+            margin-bottom: 0;
+        }
+        
+        .tip-box {
+            background: rgba(100, 255, 100, 0.1);
+            border: 1px solid #66ff66;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tip-box p {
+            color: #99ff99;
+            margin-bottom: 0;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .comparison-table th {
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+        }
+        
+        .comparison-table td {
+            color: #a0a0a0;
+        }
+        
+        .package-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .package-card {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .package-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
+        }
+        
+        .package-card h3 {
+            color: #00ffff;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .package-card p {
+            color: #a0a0a0;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        
+        .package-card code {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 3px 8px;
+            border-radius: 3px;
+            color: #00ffff;
+            font-size: 0.85em;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #333;
+            margin-top: 40px;
+        }
+        
+        .toc {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .toc h3 {
+            color: #00ffff;
+            margin-bottom: 15px;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin-bottom: 8px;
+        }
+        
+        .toc a {
+            color: #a0a0a0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .toc a:hover {
+            color: #00ffff;
+        }
+        
+        .concept-box {
+            background: rgba(255, 200, 0, 0.1);
+            border: 1px solid #ffcc00;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .concept-box p {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .concept-box p:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← 返回首頁</a>
+        
+        <div class="article-header">
+            <h1>🐳 Docker 完整教學</h1>
+            <p class="article-meta">📅 2026-03-24 · 閱讀時間：20 分鐘 · 新手友善</p>
+        </div>
+        
+        <div class="content">
+            <div class="tech-box">
+                <p>💡 本教程特色：由淺到深，零基礎也能學會容器化技術！每個概念都有實戰範例。</p>
+            </div>
+            
+            <div class="toc">
+                <h3>📑 目錄</h3>
+                <ul>
+                    <li><a href="#part1">第一部分：Docker 基礎入門</a></li>
+                    <li><a href="#part2">第二部分：核心概念</a></li>
+                    <li><a href="#part3">第三部分：常用命令</a></li>
+                    <li><a href="#part4">第四部分：Dockerfile 編寫</a></li>
+                    <li><a href="#part5">第五部分：Docker Compose</a></li>
+                    <li><a href="#part6">第六部分：實戰範例</a></li>
+                    <li><a href="#part7">第七部分：最佳實踐</a></li>
+                </ul>
+            </div>
+            
+            <h2 id="part1">第一部分：Docker 基礎入門</h2>
+            
+            <h3>什麼是 Docker？</h3>
+            <p>Docker 是一個<strong>容器化平台</strong>，讓應用程式可以在隔離的環境中運行。想像成「輕量級虛擬機」，但更快速、更節省資源。</p>
+            
+            <div class="concept-box">
+                <p>🐳 容器 vs 虛擬機</p>
+                <p>虛擬機 = 完整作業系統（笨重）</p>
+                <p>容器 = 只打包應用程式 + 依賴（輕量）</p>
+            </div>
+            
+            <h3>為什麼用 Docker？</h3>
+            <ul>
+                <li><strong>一致性：</strong> 「在我電腦上可以運行」不再是問題</li>
+                <li><strong>隔離性：</strong> 每個容器獨立，互不干擾</li>
+                <li><strong>可移植性：</strong> 一次打包，到處運行</li>
+                <li><strong>效率：</strong> 秒級啟動，資源占用少</li>
+                <li><strong>版本控制：</strong> 鏡像版本管理，隨時回滾</li>
+            </ul>
+            
+            <h3>安裝 Docker</h3>
+            
+            <div class="code-block">
+<span class="comment"># macOS（使用 Homebrew）</span>
+brew install --cask docker
+
+<span class="comment"># Windows</span>
+下載 Docker Desktop: https://www.docker.com/products/docker-desktop
+
+<span class="comment"># Ubuntu/Debian</span>
+sudo apt update
+sudo apt install docker.io
+
+<span class="comment"># 驗證安裝</span>
+docker --version
+docker run hello-world
+            </div>
+            
+            <div class="tip-box">
+                <p>💡 提示：初次運行需要啟動 Docker Desktop  daemon。首次運行 <code>docker run hello-world</code> 會自動下載測試鏡像。</p>
+            </div>
+            
+            <h2 id="part2">第二部分：核心概念</h2>
+            
+            <h3>三個關鍵概念</h3>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>概念</th>
+                        <th>比喻</th>
+                        <th>說明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>鏡像（Image）</strong></td>
+                        <td>食譜</td>
+                        <td>打包應用程式 + 環境的模板</td>
+                    </tr>
+                    <tr>
+                        <td><strong>容器（Container）</strong></td>
+                        <td>做好的菜</td>
+                        <td>鏡像運行後的實例</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dockerfile</strong></td>
+                        <td>食譜寫法</td>
+                        <td>定義如何建立鏡像的腳本</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>鏡像（Image）</h3>
+            <p>鏡像是只讀模板，包含應用程式和所有依賴。類似「快照」或「模板」。</p>
+            
+            <div class="code-block">
+<span class="comment"># 常見官方鏡像</span>
+ubuntu      <span class="comment"># Ubuntu 作業系統</span>
+nginx       <span class="comment"># Web 伺服器</span>
+python      <span class="comment"># Python 環境</span>
+node        <span class="comment"># Node.js 環境</span>
+mysql       <span class="comment"># 資料庫</span>
+redis       <span class="comment"># 快取資料庫</span>
+            </div>
+            
+            <h3>容器（Container）</h3>
+            <p>容器是鏡像的運行實例。可以啟動、停止、刪除。一個鏡像可以運行多個容器。</p>
+            
+            <div class="concept-box">
+                <p>🔄 鏡像 vs 容器關係</p>
+                <p>鏡像（Image）→ docker run → 容器（Container）</p>
+                <p>就像「類（Class）」和「物件（Object）」的關係</p>
+            </div>
+            
+            <h3>倉庫（Registry）</h3>
+            <p>儲存和分享鏡像的地方。Docker Hub 是最大的公共倉庫。</p>
+            <ul>
+                <li><strong>Docker Hub：</strong> hub.docker.com（公共）</li>
+                <li><strong>私有倉庫：</strong> 公司內部搭建</li>
+                <li><strong>Google Container Registry：</strong> gcr.io</li>
+                <li><strong>GitHub Container Registry：</strong> ghcr.io</li>
+            </ul>
+            
+            <h2 id="part3">第三部分：常用命令</h2>
+            
+            <h3>鏡像管理</h3>
+            
+            <div class="code-block">
+<span class="comment"># 搜尋鏡像</span>
+docker search python
+
+<span class="comment"># 下載鏡像</span>
+docker pull python:3.11
+docker pull nginx:latest
+
+<span class="comment"># 查看本地鏡像</span>
+docker images
+
+<span class="comment"># 刪除鏡像</span>
+docker rmi <span class="command">&lt;image_id&gt;</span>
+docker image prune  <span class="comment"># 清理懸空鏡像</span>
+
+<span class="comment"># 查看鏡像歷史</span>
+docker history <span class="command">&lt;image_name&gt;</span>
+            </div>
+            
+            <h3>容器管理</h3>
+            
+            <div class="code-block">
+<span class="comment"># 運行容器</span>
+docker run -d --name my-nginx -p 8080:80 nginx
+
+<span class="comment"># 查看運行中的容器</span>
+docker ps
+
+<span class="comment"># 查看所有容器（含停止的）</span>
+docker ps -a
+
+<span class="comment"># 停止容器</span>
+docker stop <span class="command">&lt;container_id&gt;</span>
+
+<span class="comment"># 啟動容器</span>
+docker start <span class="command">&lt;container_id&gt;</span>
+
+<span class="comment"># 刪除容器</span>
+docker rm <span class="command">&lt;container_id&gt;</span>
+docker container prune  <span class="comment"># 清理停止的容器</span>
+
+<span class="comment"># 進入容器互動</span>
+docker exec -it <span class="command">&lt;container_id&gt;</span> bash
+
+<span class="comment"># 查看容器日誌</span>
+docker logs <span class="command">&lt;container_id&gt;</span>
+            </div>
+            
+            <h3>常用選項解釋</h3>
+            
+            <div class="code-block">
+docker run [選項] 鏡像 [命令]
+
+-d          <span class="comment"># 背景運行（detached mode）</span>
+--name      <span class="comment"># 指定容器名稱</span>
+-p          <span class="comment"># 端口映射（host:container）</span>
+-v          <span class="comment">#  volumes 掛載（host:container）</span>
+-e          <span class="comment"># 環境變數</span>
+--rm        <span class="comment"># 運行完自動刪除</span>
+-it         <span class="comment"># 互動模式（-i 互動，-t 終端）</span>
+            </div>
+            
+            <h3>實戰範例</h3>
+            
+            <div class="code-block">
+<span class="comment"># 運行 Python 容器並進入互動模式</span>
+docker run -it python:3.11 python
+
+<span class="comment"># 運行 Nginx Web 伺服器</span>
+docker run -d --name web-server -p 8080:80 nginx
+
+<span class="comment"># 運行 MySQL 資料庫</span>
+docker run -d --name mysql-db \
+  -e MYSQL_ROOT_PASSWORD=mysecret \
+  -p 3306:3306 \
+  mysql:8.0
+
+<span class="comment"># 掛載本地目錄到容器</span>
+docker run -d --name dev-env \
+  -v $(pwd):/app \
+  -w /app \
+  python:3.11 tail -f /dev/null
+            </div>
+            
+            <h2 id="part4">第四部分：Dockerfile 編寫</h2>
+            
+            <div class="tech-box">
+                <p>📝 Dockerfile 是文字檔案，定義如何建立鏡像。每一行是一個指令。</p>
+            </div>
+            
+            <h3>基本指令</h3>
+            
+            <div class="code-block">
+<span class="keyword">FROM</span>        <span class="comment"># 基礎鏡像</span>
+<span class="keyword">WORKDIR</span>     <span class="comment"># 工作目錄</span>
+<span class="keyword">COPY</span>        <span class="comment"># 複製檔案</span>
+<span class="keyword">RUN</span>         <span class="comment"># 執行命令</span>
+<span class="keyword">EXPOSE</span>      <span class="comment"># 暴露端口</span>
+<span class="keyword">CMD</span>         <span class="comment"># 容器啟動命令</span>
+<span class="keyword">ENTRYPOINT</span>  <span class="comment"># 容器啟動命令（不覆蓋）</span>
+<span class="keyword">ENV</span>         <span class="comment"># 環境變數</span>
+            </div>
+            
+            <h3>Python 應用 Dockerfile 範例</h3>
+            
+            <div class="code-block">
+<span class="comment"># 基礎鏡像</span>
+<span class="keyword">FROM</span> python:3.11-slim
+
+<span class="comment"># 設定工作目錄</span>
+<span class="keyword">WORKDIR</span> /app
+
+<span class="comment"># 複製依賴檔案</span>
+<span class="keyword">COPY</span> requirements.txt .
+
+<span class="comment"># 安裝依賴</span>
+<span class="keyword">RUN</span> pip install --no-cache-dir -r requirements.txt
+
+<span class="comment"># 複製應用程式</span>
+<span class="keyword">COPY</span> . .
+
+<span class="comment"># 暴露端口</span>
+<span class="keyword">EXPOSE</span> 8000
+
+<span class="comment"># 啟動命令</span>
+<span class="keyword">CMD</span> [<span class="string">"python"</span>, <span class="string">"app.py"</span>]
+            </div>
+            
+            <h3>建立和運行</h3>
+            
+            <div class="code-block">
+<span class="comment"># 建立鏡像</span>
+docker build -t my-python-app .
+
+<span class="comment"># 運行容器</span>
+docker run -d --name my-app -p 8000:8000 my-python-app
+
+<span class="comment"># 查看鏡像</span>
+docker images | grep my-python-app
+            </div>
+            
+            <h3>Node.js 應用 Dockerfile 範例</h3>
+            
+            <div class="code-block">
+<span class="keyword">FROM</span> node:18-alpine
+
+<span class="keyword">WORKDIR</span> /app
+
+<span class="keyword">COPY</span> package*.json ./
+
+<span class="keyword">RUN</span> npm install
+
+<span class="keyword">COPY</span> . .
+
+<span class="keyword">EXPOSE</span> 3000
+
+<span class="keyword">CMD</span> [<span class="string">"npm"</span>, <span class="string">"start"</span>]
+            </div>
+            
+            <div class="tip-box">
+                <p>💡 最佳實踐：使用 <code>-slim</code> 或 <code>-alpine</code> 版本，鏡像更小更安全。</p>
+            </div>
+            
+            <h2 id="part5">第五部分：Docker Compose</h2>
+            
+            <div class="tech-box">
+                <p>🎼 Docker Compose 用於定義和運行多容器應用。用 YAML 檔案配置所有服務。</p>
+            </div>
+            
+            <h3>安裝 Compose</h3>
+            
+            <div class="code-block">
+<span class="comment"># 驗證安裝</span>
+docker-compose --version
+
+<span class="comment"># macOS（Docker Desktop 已包含）</span>
+<span class="comment"># Ubuntu</span>
+sudo apt install docker-compose
+            </div>
+            
+            <h3>docker-compose.yml 範例</h3>
+            
+            <div class="code-block">
+version: <span class="string">'3.8'</span>
+
+services:
+  <span class="comment"># Web 應用</span>
+  web:
+    build: .
+    ports:
+      - <span class="string">"3000:3000"</span>
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=mysql://root:secret@db:3306/mydb
+
+  <span class="comment"># 資料庫</span>
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: mydb
+    volumes:
+      - db-data:/var/lib/mysql
+
+  <span class="comment"># Redis 快取</span>
+  redis:
+    image: redis:alpine
+    ports:
+      - <span class="string">"6379:6379"</span>
+
+volumes:
+  db-data:
+            </div>
+            
+            <h3>常用 Compose 命令</h3>
+            
+            <div class="code-block">
+<span class="comment"># 啟動所有服務</span>
+docker-compose up -d
+
+<span class="comment"># 停止所有服務</span>
+docker-compose down
+
+<span class="comment"># 查看服務狀態</span>
+docker-compose ps
+
+<span class="comment"># 查看日誌</span>
+docker-compose logs -f
+
+<span class="comment"># 重新建立鏡像</span>
+docker-compose up -d --build
+
+<span class="comment"># 進入特定服務容器</span>
+docker-compose exec web bash
+            </div>
+            
+            <h2 id="part6">第六部分：實戰範例</h2>
+            
+            <h3>範例 1：部署 WordPress</h3>
+            
+            <div class="code-block">
+version: <span class="string">'3.8'</span>
+
+services:
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - <span class="string">"8080:80"</span>
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wppass
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp-content:/var/www/html/wp-content
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wppass
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  wp-content:
+  db-data:
+            </div>
+            
+            <p>運行：<code>docker-compose up -d</code>，訪問 <code>http://localhost:8080</code></p>
+            
+            <h3>範例 2：Python Flask API</h3>
+            
+            <div class="code-block">
+<span class="comment"># app.py</span>
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask
+
+app = Flask(__name__)
+
+@app.route(<span class="string">'/'</span>)
+<span class="keyword">def</span> home():
+    <span class="keyword">return</span> <span class="string">"Hello from Docker!"</span>
+
+<span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:
+    app.run(host=<span class="string">'0.0.0.0'</span>, port=<span class="number">5000</span>)
+            </div>
+            
+            <div class="code-block">
+<span class="comment"># Dockerfile</span>
+<span class="keyword">FROM</span> python:3.11-slim
+<span class="keyword">WORKDIR</span> /app
+<span class="keyword">COPY</span> requirements.txt .
+<span class="keyword">RUN</span> pip install flask
+<span class="keyword">COPY</span> . .
+<span class="keyword">EXPOSE</span> 5000
+<span class="keyword">CMD</span> [<span class="string">"python"</span>, <span class="string">"app.py"</span>]
+            </div>
+            
+            <div class="code-block">
+<span class="comment"># requirements.txt</span>
+flask==2.3.0
+            </div>
+            
+            <p>建立並運行：<code>docker build -t flask-app . && docker run -d -p 5000:5000 flask-app</code></p>
+            
+            <h3>範例 3：全棧應用（React + Node + MongoDB）</h3>
+            
+            <div class="code-block">
+version: <span class="string">'3.8'</span>
+
+services:
+  <span class="comment"># 前端</span>
+  frontend:
+    build: ./client
+    ports:
+      - <span class="string">"3000:3000"</span>
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  <span class="comment"># 後端</span>
+  backend:
+    build: ./server
+    ports:
+      - <span class="string">"5000:5000"</span>
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/myapp
+      - PORT=5000
+    depends_on:
+      - mongo
+
+  <span class="comment"># 資料庫</span>
+  mongo:
+    image: mongo:6
+    ports:
+      - <span class="string">"27017:27017"</span>
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
+            </div>
+            
+            <h3>範例 4：開發環境容器化</h3>
+            
+            <div class="code-block">
+<span class="comment"># docker-compose.dev.yml</span>
+version: <span class="string">'3.8'</span>
+
+services:
+  dev-env:
+    image: node:18-alpine
+    container_name: my-dev-env
+    working_dir: /app
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    ports:
+      - <span class="string">"3000:3000"</span>
+    command: tail -f /dev/null
+    environment:
+      - NODE_ENV=development
+
+volumes:
+  node_modules:
+            </div>
+            
+            <p>運行：<code>docker-compose -f docker-compose.dev.yml up -d</code></p>
+            <p>進入容器：<code>docker exec -it my-dev-env sh</code></p>
+            
+            <h2 id="part7">第七部分：最佳實踐</h2>
+            
+            <div class="tech-box">
+                <p>✅ 遵循這些最佳實踐，讓你的 Docker 更高效、更安全。</p>
+            </div>
+            
+            <h3>鏡像優化</h3>
+            <ul>
+                <li><strong>使用小鏡像：</strong> Alpine 或 slim 版本</li>
+                <li><strong>多階段建構：</strong> 減少最終鏡像大小</li>
+                <li><strong>.dockerignore：</strong> 排除不必要的檔案</li>
+                <li><strong>層級優化：</strong> 把不常變化的指令放前面</li>
+            </ul>
+            
+            <div class="code-block">
+<span class="comment"># 多階段建構範例</span>
+<span class="comment"># 第一階段：建構</span>
+<span class="keyword">FROM</span> node:18 AS builder
+<span class="keyword">WORKDIR</span> /app
+<span class="keyword">COPY</span> . .
+<span class="keyword">RUN</span> npm install && npm run build
+
+<span class="comment"># 第二階段：運行</span>
+<span class="keyword">FROM</span> nginx:alpine
+<span class="keyword">COPY</span> --from=builder /app/dist /usr/share/nginx/html
+<span class="keyword">EXPOSE</span> 80
+            </div>
+            
+            <h3>安全性</h3>
+            <ul>
+                <li><strong>不要以 root 運行：</strong> 創建普通用戶</li>
+                <li><strong>掃描漏洞：</strong> <code>docker scan &lt;image&gt;</code></li>
+                <li><strong>最小權限：</strong> 只暴露必要的端口</li>
+                <li><strong>更新鏡像：</strong> 定期更新基礎鏡像</li>
+            </ul>
+            
+            <div class="code-block">
+<span class="comment"># 創建非 root 用戶</span>
+<span class="keyword">FROM</span> python:3.11-slim
+<span class="keyword">RUN</span> useradd -m appuser
+<span class="keyword">WORKDIR</span> /app
+<span class="keyword">COPY</span> --chown=appuser:appuser . .
+<span class="keyword">USER</span> appuser
+            </div>
+            
+            <h3>日誌管理</h3>
+            <ul>
+                <li><strong>輸出到 stdout/stderr：</strong> Docker 自動收集</li>
+                <li><strong>使用日誌驅動：</strong> json-file, syslog, journald</li>
+                <li><strong>限制日誌大小：</strong> 避免磁碟爆滿</li>
+            </ul>
+            
+            <h3>資源限制</h3>
+            
+            <div class="code-block">
+<span class="comment"># 限制 CPU 和記憶體</span>
+docker run -d --name limited-app \
+  --cpus=<span class="string">"1.0"</span> \
+  --memory=<span class="string">"512m"</span> \
+  my-app
+            </div>
+            
+            <h3>版本控制</h3>
+            <ul>
+                <li><strong>固定版本：</strong> 不要用 <code>latest</code>，用具體版本號</li>
+                <li><strong>標籤策略：</strong> <code>major.minor.patch</code></li>
+                <li><strong>鏡像倉庫：</strong> 使用私有倉庫儲存生產鏡像</li>
+            </ul>
+            
+            <div class="warning-box">
+                <p>⚠️ 常見錯誤：在容器中儲存持久化數據！使用 volumes 或 bind mounts 保存重要數據。</p>
+            </div>
+            
+            <div class="tip-box">
+                <p>💡 開發流程：本地開發 → Docker 測試 → CI/CD 自動建構 → 生產部署</p>
+            </div>
+            
+            <h2>🎯 下一步學習</h2>
+            
+            <div class="tech-box">
+                <p>🚀 學完本教程後，你可以往這些方向發展：</p>
+            </div>
+            
+            <h3>📌 學習路線建議</h3>
+            <ul>
+                <li><strong>Kubernetes：</strong> 容器編排，管理大型集群</li>
+                <li><strong>CI/CD：</strong> GitHub Actions, GitLab CI，自動建構部署</li>
+                <li><strong>服務網格：</strong> Istio, Linkerd，微服務通訊</li>
+                <li><strong>監控：</strong> Prometheus, Grafana，容器監控</li>
+                <li><strong>安全：</strong> Docker Security Best Practices</li>
+            </ul>
+            
+            <h3>📚 推薦資源</h3>
+            <ul>
+                <li><strong>官方文件：</strong> <a href="https://docs.docker.com/" style="color: #00ffff;">Docker 官方文件</a></li>
+                <li><strong>最佳實踐：</strong> Docker Best Practices</li>
+                <li><strong>練習平台：</strong> Play with Docker（免費沙盒）</li>
+                <li><strong>社群：</strong> Docker Hub, Stack Overflow</li>
+            </ul>
+            
+            <div class="warning-box">
+                <p>⚠️ 常見新手錯誤：不要把所有東西打包進一個容器！遵循「一個容器一個服務」原則。</p>
+            </div>
+            
+            <div class="tip-box">
+                <p>💡 最佳學習法：從簡單應用開始（Nginx, Python），逐步增加複雜度（資料庫，多服務）。</p>
+            </div>
+            
+            <h3>🏁 結語</h3>
+            <p>Docker 是現代開發的必備技能。從基礎概念到 Dockerfile，從 Compose 到生產部署，每一步都是成長。</p>
+            <p>記住：容器化不是目的，而是手段。讓開發更高效、部署更可靠，才是真正的價值。</p>
+            
+            <div class="tech-box">
+                <p>🏎️ Porsche哥 © 2026 | 天馬行空但務實 | 多領域專家</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Porsche哥 © 2026 | Powered by OpenClaw</p>
+        </div>
+    </div>
+</body>
+</html>
