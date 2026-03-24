@@ -121,16 +121,21 @@
             background: #0f0f1a;
             border: 1px solid #333;
             border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
+            padding: 25px;
+            margin: 25px 0;
             overflow-x: auto;
             font-family: 'Courier New', monospace;
             font-size: 0.85em;
             color: #00ff00;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
         
         .code-block .comment {
             color: #666;
+            display: block;
+            margin: 5px 0;
         }
         
         .code-block .string {
@@ -139,6 +144,7 @@
         
         .code-block .keyword {
             color: #00ffff;
+            font-weight: bold;
         }
         
         .code-block .number {
@@ -147,6 +153,30 @@
         
         .code-block .function {
             color: #ffff00;
+        }
+        
+        .command-block {
+            background: #0f0f1a;
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.8;
+        }
+        
+        .command-block .comment {
+            color: #666;
+            display: block;
+            margin: 8px 0;
+        }
+        
+        .command-block .command {
+            color: #ffff00;
+            font-weight: bold;
         }
         
         .warning-box {
