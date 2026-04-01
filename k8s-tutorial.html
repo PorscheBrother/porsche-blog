@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes 完整教學 - Porsche哥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #00ffff;
+            text-decoration: none;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .article-header {
+            border-left: 4px solid #00ffff;
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .article-header h1 {
+            font-size: 2.5em;
+            color: #00ffff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            margin-bottom: 15px;
+        }
+        
+        .article-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .content h2 {
+            color: #ff00ff;
+            font-size: 1.6em;
+            margin: 30px 0 15px 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .content h2:first-child {
+            margin-top: 0;
+        }
+        
+        .content h3 {
+            color: #00ffff;
+            font-size: 1.3em;
+            margin: 25px 0 12px 0;
+        }
+        
+        .content p {
+            margin-bottom: 20px;
+            color: #a0a0a0;
+        }
+        
+        .content ul {
+            margin: 20px 0 20px 30px;
+            color: #a0a0a0;
+        }
+        
+        .content li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .tech-box {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-box p {
+            margin-bottom: 0;
+            color: #00ffff;
+        }
+        
+        .code-block {
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.5;
+            white-space: pre;
+        }
+        
+        .code-block .comment {
+            color: #666;
+            display: block;
+            margin: 8px 0;
+        }
+        
+        .code-block .string {
+            color: #ff99ff;
+        }
+        
+        .code-block .keyword {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .code-block .command {
+            color: #ffff00;
+            font-weight: bold;
+        }
+        
+        .command-block {
+            background: #0f0f1a;
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.6;
+        }
+        
+        .command-block .comment {
+            color: #666;
+            display: block;
+            margin: 10px 0 6px 0;
+        }
+        
+        .command-block .command {
+            color: #ffff00;
+            font-weight: bold;
+            display: block;
+            margin: 6px 0;
+        }
+        
+        .warning-box {
+            background: rgba(255, 100, 100, 0.1);
+            border: 1px solid #ff6666;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .warning-box p {
+            color: #ff9999;
+            margin-bottom: 0;
+        }
+        
+        .tip-box {
+            background: rgba(100, 255, 100, 0.1);
+            border: 1px solid #66ff66;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tip-box p {
+            color: #66ff66;
+            margin-bottom: 0;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← 回到首頁</a>
+        
+        <div class="article-header">
+            <h1>Kubernetes 完整教學</h1>
+            <p class="article-meta">由 Porsche哥 編寫 • 2026年4月2日</p>
+        </div>
+        
+        <div class="content">
+            <h2>什麼是 Kubernetes？</h2>
+            <p>Kubernetes（通常縮寫為 K8s）是一個開源的容器編排平台，由 Google 原始開發，現在由 Cloud Native Computing Foundation (CNCF) 維護。它能夠自動化部署、擴容和管理容器化應用程式。</p>
+            
+            <div class="tech-box">
+                <p>K8s 名稱來源：Kubernetes 有 8 個字母在 "K" 和 "s" 之間，因此 K8s 代表 "K" + 8 個字母 + "s"</p>
+            </div>
+            
+            <h2>為什麼需要 Kubernetes？</h2>
+            <p>在微服務架構和容器化時代，傳統的部署方式無法滿足快速迭代和彈性擴容的需求。Kubernetes 提供了：</p>
+            <ul>
+                <li><strong>自動部署與回滾：</strong> Declarative 配置確保應用程式始終處於預期狀態</li>
+                <li><strong>服務發現與負載均衡：</strong> 自動分配 IP 和 DNS 名稱，負載流量分配</li>
+                <li><strong>儲存空間編排：</strong> 自動掛載本地儲存、公有雲提供者等</li>
+                <li><strong>自動擴縮容：</strong> 根據 CPU 使用率或其他自定義指標調整 Pod 數量</li>
+                <li><strong>自我修復：</strong> 重新啟動失敗的容器，替換和重新排程節點</li>
+                <li><strong>密鑰與配置管理：</strong> 安全地存儲和管理敏感資訊如密碼、OAuth 權杖和 SSH 金鑰</li>
+            </ul>
+            
+            <h2>Kubernetes 基礎概念</h2>
+            
+            <h3>節點 (Nodes)</h3>
+            <p>節點是運行容器的工作機器。可以是實體機器或虛擬機器。每個節點包含運行 Pods 所需的服務：</p>
+            <ul>
+                <li><strong>Container Runtime：</strong> 負責運行容器（如 Docker、containerd、cri-o）</li>
+                <li><strong>Kubelet：</strong> 在每個節點上的代理，確保容器在 Pod 中運行</li>
+                <li><strong>Kube-proxy：</strong> 維護網路規則並執行連線轉發</li>
+            </ul>
+            
+            <h3>Pods</h3>
+            <p>Pod 是 Kubernetes 中最小的部署單位。它代表叢集中正在運行的一個或多個容器。Pod 中的容器共享:</p>
+            <ul>
+                <li>網路命名空間（同一 IP 和埠空間）</li>
+                <li>掛載卷（共享檔案系統）</li>
+                <li>生命週期（一起被創建和銷毀）</li>
+            </ul>
+            
+            <div class="code-block">
+                <span class="comment"># 最簡單的 Pod YAML</span>
+                apiVersion: v1
+                kind: Pod
+                metadata:
+                  name: hello-world-pod
+                  labels:
+                    app: hello-world
+                spec:
+                  containers:
+                  - name: hello-world
+                    image: nginx:latest
+                    ports:
+                    - containerPort: 80
+            </div>
+            
+            <h3>命名空間 (Namespaces)</h3>
+            <p>命名空間提供了一種將叢集資源隔離的機制。在同一個叢集中，您可以創建多個命名空間來邏輯上分隔不同的團隊、專案或環境。</p>
+            
+            <div class="code-block">
+                <span class="comment"># 創建命名空間</span>
+                apiVersion: v1
+                kind: Namespace
+                metadata:
+                  name: development
+            </div>
+            
+            <h3>標籤 (Labels) 和選擇器 (Selectors)</h3>
+            <p>標籤是附加到物件上的鍵值對，用於組織和選擇子集物件。選擇器則用於根據標籤過濾物件。</p>
+            
+            <div class="code-block">
+                <span class="comment"># 帶標籤的 Pod</span>
+                apiVersion: v1
+                kind: Pod
+                metadata:
+                  name: labeled-pod
+                  labels:
+                    app: web
+                    tier: frontend
+                    release: stable
+                spec:
+                  containers:
+                  - name: web
+                    image: nginx
+            </div>
+            
+            <h2>控制器 (Controllers)</h2>
+            <p>控制器是確保叢集處於預期狀態的控制循環。它持續監視當前狀態並採取行動使其達到預期狀態。</p>
+            
+            <h3>ReplicaSet</h3>
+            <p>ReplicaSet 確保在任何時候都有指定數量的 Pod 副本在運行。如果 Pod 數量不足，它會創建新的 Pod；如果過多，它會終止多餘的 Pod。</p>
+            
+            <div class="code-block">
+                <span class="comment"># ReplicaSet 範例</span>
+                apiVersion: apps/v1
+                kind: ReplicaSet
+                metadata:
+                  name: frontend-replicaset
+                  labels:
+                    app: guestbook
+                    tier: frontend
+                spec:
+                  replicas: 3
+                  selector:
+                    matchLabels:
+                      tier: frontend
+                  template:
+                    metadata:
+                      labels:
+                        tier: frontend
+                    spec:
+                      containers:
+                      - name: php-redis
+                        image: gcr.io/google_samples/gb-frontend:v3
+            </div>
+            
+            <h3>Deployment（推薦使用）</h3>
+            <p>Deployment 提供聲明式更新 Pod 和 ReplicaSet 的能力。您只需要描述預期狀態，Deployment 控制器會逐步將實際狀態變更為預期狀態。</p>
+            
+            <div class="code-block">
+                <span class="comment"># Deployment 範例</span>
+                apiVersion: apps/v1
+                kind: Deployment
+                metadata:
+                  name: nginx-deployment
+                  labels:
+                    app: nginx
+                spec:
+                  replicas: 3
+                  selector:
+                    matchLabels:
+                      app: nginx
+                  template:
+                    metadata:
+                      labels:
+                        app: nginx
+                    spec:
+                      containers:
+                      - name: nginx
+                        image: nginx:1.14.2
+                        ports:
+                        - containerPort: 80
+            </div>
+            
+            <h2>服務 (Service)</h2>
+            <p>Service 是一種抽象概念，它定義了一種邏輯上的 Pod 集合和訪問這些 Pod 的策略。Service 使應用程式可以透過單一的入口點訪問後端 Pod，即使 Pod 會因為擴縮容或失敗而變化。</p>
+            
+            <h3>Service 類型</h3>
+            <ul>
+                <li><strong>ClusterIP：</strong> 預設類型，僅在叢集內部可訪問</li>
+                <li><strong>NodePort：</strong> 在每個節點的靜態埠上暴露服務</li>
+                <li><strong>LoadBalancer：</strong> 使用雲提供者的負載均衡器暴露服務</li>
+                <li><strong>ExternalName：</strong> 返回 CNAME 和其值，將服務映射到 externalName 資料內容</li>
+            </ul>
+            
+            <div class="code-block">
+                <span class="comment"># Service 範例（ClusterIP）</span>
+                apiVersion: v1
+                kind: Service
+                metadata:
+                  name: nginx-service
+                spec:
+                  selector:
+                    app: nginx
+                  ports:
+                  - protocol: TCP
+                    port: 80
+                    targetPort: 80
+                  type: ClusterIP
+            </div>
+            
+            <h2>配置與密鑰管理</h2>
+            
+            <h3>ConfigMap</h3>
+            <p>ConfigMap 用於存儲非機密性的配置數據。Pod 可以將 ConfigMap 作為環境變數、命令行參數或掛載卷的方式使用。</p>
+            
+            <div class="code-block">
+                <span class="comment"># ConfigMap 範例</span>
+                apiVersion: v1
+                kind: ConfigMap
+                metadata:
+                  name: game-demo
+                data:
+                  # 屬性鍵值對
+                  player_initial_lives: "3"
+                  ui_properties_file_name: "ui.properties"
+                  # 檔案類似資料
+                  game.properties: |
+                    enemy.types=aliens,monsters
+                    player.maximum-lives=5
+                  ui.properties: |
+                    color.good=purple
+                    color.bad=yellow
+                    allow.textmode=true
+            </div>
+            
+            <h3>Secret</h3>
+            <p>Secret 用於存儲和管理敏感資訊，如密碼、OAuth 權杖和 SSH 金鑰。將這樣的資訊放在 Secret 中比放在 Pod 定義或 Docker Image 中更安全和更靈活。</p>
+            
+            <div class="code-block">
+                <span class="comment"># Secret 範例（建議使用 kubectl create secret 建立）</span>
+                apiVersion: v1
+                kind: Secret
+                metadata:
+                  name: db-secret
+                type: Opaque
+                data:
+                  # 值必須是 base64 編碼
+                  username: YWRtaW4=
+                  password: MWYyZDFlMmU2N2Rm
+            </div>
+            
+            <h2>存儲卷 (Volumes)</h2>
+            <p>Volume 解決了容器檔案系統的兩個問題：</p>
+            <ul>
+                <li>當容器崩潰時， kubelet 會重新啟動它，但容器中的檔案會丟失</li>
+                <li>當需要在容器之間共享檔案時</li>
+            </ul>
+            <p>Kubernetes 支持多種卷類型，包括本地磁碟、雲端硬碟、網路檔案系統等。</p>
+            
+            <div class="code-block">
+                <span class="comment"># 使用 emptyDir 卷的 Pod</span>
+                apiVersion: v1
+                kind: Pod
+                metadata:
+                  name: test-empty-dir
+                spec:
+                  containers:
+                  - name: test-container
+                    image: nginx
+                    volumeMounts:
+                    - name: cache-volume
+                      mountPath: /cache
+                  volumes:
+                  - name: cache-volume
+                    emptyDir: {}
+            </div>
+            
+            <h2>命名空間資源配額</h2>
+            <p>為防止資源耗盡，您可以為命名空間設置資源配額，限制該命名空間內可以消耗的資源數量。</p>
+            
+            <div class="code-block">
+                <span class="comment"># 資源配額範例</span>
+                apiVersion: v1
+                kind: ResourceQuota
+                metadata:
+                  name: compute-quota
+                  namespace: development
+                spec:
+                  hard:
+                    pods: "10"
+                    requests.cpu: "4"
+                    requests.memory: 5Gi
+                    limits.cpu: "10"
+                    limits.memory: 10Gi
+            </div>
+            
+            <h2>實踐：部署您的第一個應用</h2>
+            <p>讓我們一步步部署一個簡單的網站應用。</p>
+            
+            <h3>步驟 1：建立 Deployment</h3>
+            <div class="code-block">
+                <span class="comment"># 建立 hello-deployment.yaml</span>
+                apiVersion: apps/v1
+                kind: Deployment
+                metadata:
+                  name: hello-deployment
+                spec:
+                  replicas: 2
+                  selector:
+                    matchLabels:
+                      app: hello
+                  template:
+                    metadata:
+                      labels:
+                        app: hello
+                    spec:
+                      containers:
+                      - name: hello
+                        image: nginx:latest
+                        ports:
+                        - containerPort: 80
+                        resources:
+                          requests:
+                            memory: "64Mi"
+                            cpu: "250m"
+                          limits:
+                            memory: "128Mi"
+                            cpu: "500m"
+            </div>
+            
+            <h3>步驟 2：暴露為 Service</h3>
+            <div class="code-block">
+                <span class="comment"># 建立 hello-service.yaml</span>
+                apiVersion: v1
+                kind: Service
+                metadata:
+                  name: hello-service
+                spec:
+                  selector:
+                    app: hello
+                  ports:
+                  - protocol: TCP
+                    port: 80
+                    targetPort: 80
+                  type: LoadBalancer
+            </div>
+            
+            <h3>步驟 3：應用配置</h3>
+            <div class="code-block">
+                <span class="comment"># 使用 kubectl 應用配置</span>
+                kubectl apply -f hello-deployment.yaml
+                kubectl apply -f hello-service.yaml
+                
+                <span class="comment"># 檢查部署狀態</span>
+                kubectl get deployments
+                kubectl get pods
+                kubectl get services
+            </div>
+            
+            <h2>進階概念</h2>
+            
+            <h3>Helm 套件管理器</h3>
+            <p>Helm 是 Kubernetes 的套件管理器，類似於 apt/yum/Homebrew。它使用圖表（Charts）來定義、安裝和升級複雜的 Kubernetes 應用。</p>
+            
+            <div class="tip-box">
+                <p>使用 Helm 的好處：</p>
+                <ul>
+                    <li>可重複部署應用</li>
+                    <li>版本控制和回滾</li>
+                    <li>相依性管理</li>
+                    <li>模板化配置</li>
+                </ul>
+            </div>
+            
+            <h3>監控與日誌</h3>
+            <p>生產環境中監控和日誌記錄至關重要。Kubernetes 生態系統提供了豐富的工具：</p>
+            <ul>
+                <li><strong>監控：</strong> Prometheus + Grafana</li>
+                <li><strong>日誌：</strong> ELK 棧 (Elasticsearch, Logstash, Kibana) 或 Fluentd</li>
+                <li><strong>追蹤：</strong> Jaeger 或 Zipkin</li>
+            </ul>
+            
+            <h2>最佳實踐</h2>
+            <ul>
+                <li><strong>使用命名空間：</strong> 隔離不同環境和團隊</li>
+                <li><strong>資源請求與限制：</strong> 為所有容器設置適當的 requests 和 limits</li>
+                <li><strong>健康檢查：</strong> 使用 liveness 和 readiness 探針</li>
+                <li><strong>滾動更新：</strong> 使用 Deployment 進行無縫更新</li>
+                <li><strong>備份與災難復原：</strong> 定期備份 etcd 和持久卷</li>
+                <li><strong>安全性：</strong> 使用 RBAC、Pod 安全標準和網路策略</li>
+            </ul>
+            
+            <h2>結語</h2>
+            <p>Kubernetes 看起來可能很複雜，但一旦理解了其核心概念和設計哲學，您會發現它是一個極其強大且靈活的平台。從基本的 Pod 到複雜的微服務架構，Kubernetes 提供了構建現代雲原生應用所需的所有工具。</p>
+            <p>隨著實踐經驗的增加，您將能夠熟練地使用 Kubernetes 來構建、部署和管理可擴展、彈性和自愈的應用程式。</p>
+            
+            <div class="warning-box">
+                <p>記住：Kubernetes 是一個生態系統，不是孤立的工具。持續學習和探索相關工具（如 Istio、Knative、Argo CD 等）將使您的 Kubernetes 之旅更加豐富。</p>
+            </div>
+        </div>
+        
+        <footer>
+            © 2026 Porsche哥. All rights reserved.
+        </footer>
+    </div>
+</body>
+</html>
