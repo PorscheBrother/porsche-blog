@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI vs Flask 比較 - Porsche哥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #00ffff;
+            text-decoration: none;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .article-header {
+            border-left: 4px solid #00ffff;
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .article-header h1 {
+            font-size: 2.5em;
+            color: #00ffff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            margin-bottom: 15px;
+        }
+        
+        .article-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .content h2 {
+            color: #ff00ff;
+            font-size: 1.6em;
+            margin: 30px 0 15px 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .content h2:first-child {
+            margin-top: 0;
+        }
+        
+        .content h3 {
+            color: #00ffff;
+            font-size: 1.3em;
+            margin: 25px 0 12px 0;
+        }
+        
+        .content p {
+            margin-bottom: 20px;
+            color: #a0a0a0;
+        }
+        
+        .content ul {
+            margin: 20px 0 20px 30px;
+            color: #a0a0a0;
+        }
+        
+        .content li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .tech-box {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-box p {
+            margin-bottom: 0;
+            color: #00ffff;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: rgba(0, 255, 255, 0.02);
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #333;
+            padding: 15px;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        .comparison-table th {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: rgba(0, 255, 255, 0.01);
+        }
+        
+        .comparison-table tr:hover {
+            background: rgba(0, 255, 255, 0.05);
+        }
+        
+        .feature-badge {
+            display: inline-block;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 0.85em;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .feature-badge.fastapi {
+            background: rgba(255, 0, 255, 0.1);
+            border-color: #ff00ff;
+            color: #ff00ff;
+        }
+        
+        .feature-badge.flask {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: #00ffff;
+            color: #00ffff;
+        }
+        
+        .verdict-box {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 0;
+        }
+        
+        .verdict-title {
+            color: #00ffff;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .verdict-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .verdict-item {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            border-radius: 12px;
+            padding: 25px;
+        }
+        
+        .verdict-item h3 {
+            color: #ff00ff;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .verdict-item p {
+            color: #a0a0a0;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        .code-block {
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.5;
+            white-space: pre;
+        }
+        
+        .code-block .comment {
+            color: #666;
+            display: block;
+            margin: 8px 0;
+        }
+        
+        .code-block .string {
+            color: #ff99ff;
+        }
+        
+        .code-block .keyword {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .code-block .number {
+            color: #ff9900;
+        }
+        
+        .code-block .function {
+            color: #ffff00;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← 回到首頁</a>
+        
+        <div class="article-header">
+            <h1>FastAPI vs Flask 比較</h1>
+            <p class="article-meta">由 Porsche哥 編寫 • 2026年4月6日</p>
+        </div>
+        
+        <div class="content">
+            <h2>概述</h2>
+            <p>FastAPI 和 Flask 都是流行的 Python Web 框架，但它们有不同的設計哲學和適用場景。本文將從多個維度詳細比較這兩個框架，幫助您根據具體需求做出選擇。</p>
+            
+            <h2>詳細比較表</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>比較維度</th>
+                        <th>FastAPI</th>
+                        <th>Flask</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>效能</strong></td>
+                        <td>
+                            <span class="feature-badge fastapi">⚡ 極高</span>
+                            基於 Starlette 和 Pydantic，效能接近 NodeJS 和 Go<br>
+                            異步原生支援，高併發場景表現優秀<br>
+                            每個請求的開銷較低
+                        </td>
+                        <td>
+                            <span class="feature-badge flask">🔧 良好</span>
+                            同步為主，異步需要額外擴展<br>
+                            適合中小流量應用<br>
+                            每個請求開銷較 FastAPI 高
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>開發速度</strong></td>
+                        <td>
+                            <span class="feature-badge fastapi">🚀 快速</span>
+                            自動文件生成節省大量時間<br>
+                            類型提示提供 IDE 自動補全和錯誤檢查<br>
+                            依賴注入減少樣板代碼
+                        </td>
+                        <td>
+                            <span class="feature-badge flask">⚡ 基礎</span>
+                            簡單直接，初學易上手<br>
+                            需要手動寫文件或使用擴展<br>
+                            靈活但可能需要更多樣板代碼
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>學習曲線</strong></td>
+                        <td>
+                            <span class="feature-badge fastapi">📈 中等</span>
+                            需要理解 Python 類型提示<br>
+                            異步概念可能對新手有一定門檻<br>
+                            文件完善，有很多最佳實踐指南
+                        </td>
+                        <td>
+                            <span class="feature-badge flask">📉 低</span>
+                            极簡 API，易於理解<br>
+                            豐富教程和社群資源<br>
+                            適合編程初學者
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>類型安全</strong></td>
+                        <td>
+                            <span class="feature-badge fastapi">🛡️ 強</span>
+                            基於 Pydantic 的嚴格類型驗證<br>
+                            自動序列化和反序列化<br>
+                            編譯時檢查類型錯誤
+                        </td>
+                        <td>
+                            <span class="feature-badge flask">⚠️ 弱</span>
+                            依賴開發者手動驗證<br>
+                            無內建類型系統<br>
+                            錯誤通常在運行時才發現
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>自動文件</strong></td>
+                        <td>
+                            <span class="feature-badge fastapi">📖 內建</span>
+                            自動生成 Swagger UI 和 ReDoc<br>
+                            永遠與代碼同步<br>
+                            支援測試和調試
+                        </td>
+                        <td>
+                            <span class="feature-badge flask">📝 手動</span>
+                            需要額外工具如 Flasgger 或手動編寫<br>
+                            文件容易與代碼不同步<br>
+                            維護成本較高
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>依賴注入</strong></td>
+                        <td>
+                            <span class="feature-badge fastapi">💉 強大</span>
+                            內建強大的依賴注入系統<br>
+                            支援快取、協程作用域等進階特性<br>
+                            測試友好，易於模擬依賴
+                        </td>
+                        <td>
+                            <span class="feature-badge flask">🔧 基礎</span>
+                            依賴第三方擴展如 Flask-Injector<br>
+                            實現較為簡單<br>
+                            功能相對有限
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>異步支援</strong></td>
+                        <td>
+                            <span class="feature-badge fastapi">🔄 原生</span>
+                            完全原生 async/await 支援<br>
+                            所有內建組件都支援異步<br>
+                            適合 I/O 密集型應用
+                        </td>
+                        <td>
+                            <span class="feature-badge flask">⚙️ 擴展</span>
+                            透過擴展如 Quart 或手動實現<br>
+                            需要額外配置和適配<br>
+                            生態系統較為分散
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>生態系統</strong></td>
+                        <td>
+                            <span class="feature-badge fastapi">📦 成長中</span>
+                            較新但增長迅速<br>
+                            官方擴展較少但核心功能完整<br>
+                            受益於 Starlette 生態系統
+                        </td>
+                        <td>
+                            <span class="feature-badge flask">📦 成熟</span>
+                            十年以上發展歷史<br>
+                            豐富的擴展（認證、表單、資料庫等）<br>
+                            廣泛採用於各種專案
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>測試支援</strong></td>
+                        <td>
+                            <span class="feature-badge fastapi">🧪 優秀</span>
+                            基於 Starlette 的測試客戶端<br>
+                            依賴注入使模擬依賴變得簡單<br>
+                            異步測試原生支援
+                        </td>
+                        <td>
+                            <span class="feature-badge flask">🧪 良好</span>
+                            內建測試客戶端<br>
+                            豐富的測試擴展和最佳實踐<br>
+                            需要額外工具處理異步測試
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>社群與文件</strong></td>
+                        <td>
+                            <span class="feature-badge fastapi">👥 活躍</span>
+                            快速增長的社群<br>
+                            官方文件詳細且範例豐富<br>
+                            活躍的 GitHub 儲存庫
+                        </td>
+                        <td>
+                            <span class="feature-badge flask">👥 廣泛</span>
+                            廣大且成熟的社群<br>
+                            大量教程、書籍和線上資源<br>
+                            Stack Overflow 上問題答案眾多
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>適合場景</strong></td>
+                        <td>
+                            <span class="feature-badge fastapi">🎯 現代應用</span>
+                            高效能 API 和微服務<br>
+                            需要自動文件的內部工具<br>
+                            異步 I/O 密集型應用<br>
+                            重視類型安全和開發工具的團隊
+                        </td>
+                        <td>
+                            <span class="feature-badge flask">🎯 傳統應用</span>
+                            傳統多頁面 Web 應用<br>
+                            原型開發和概念驗證<br>
+                            教學和教育用途<br>
+                            需要特定擴展功能的專案
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h2>程式碼範例比較</h2>
+            
+            <h3>基本「Hello World」</h3>
+            
+            <div class="code-block">
+<span class="comment"># FastAPI 版本</span>
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI
+
+app = FastAPI()
+
+<span class="keyword">@app</span>.get(<span class="string">"/"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> read_root():
+    <span class="keyword">return</span> {<span class="string">"message"</span>: <span class="string">"Hello World"</span>}
+</div>
+            
+            <div class="code-block">
+<span class="comment"># Flask 版本</span>
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask
+
+app = Flask(__name__)
+
+<span class="keyword">@app</span>.route(<span class="string">"/"</span>)
+<span class="keyword">def</span> hello():
+    <span class="keyword">return</span> <span class="string">"Hello World"</span>
+</div>
+            
+            <h3>帶參數的端點</h3>
+            
+            <div class="code-block">
+<span class="comment"># FastAPI 版本（帶類型驗證）</span>
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI
+<span class="keyword">from</span> typing <span class="keyword">import</span> Optional
+
+app = FastAPI()
+
+<span class="keyword">@app</span>.get(<span class="string">"/items/{item_id}"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> read_item(item_id: <span class="keyword">int</span>, q: Optional[<span class="keyword">str</span>] = <span class="keyword">None</span>):
+    <span class="keyword">return</span> {<span class="string">"item_id"</span>: item_id, <span class="string">"q"</span>: q}
+</div>
+            
+            <div class="code-block">
+<span class="comment"># Flask 版本（需手動驗證）</span>
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request
+
+app = Flask(__name__)
+
+<span class="keyword">@app</span>.route(<span class="string">"/items/&lt;int:item_id&gt;"</span>)
+<span class="keyword">def</span> read_item(item_id):
+    q = request.args.get('q')  # 自行處理類型轉換和驗證
+    <span class="keyword">return</span> {'item_id': item_id, 'q': q}
+</div>
+            
+            <h3>POST 請求與資料驗證</h3>
+            
+            <div class="code-block">
+<span class="comment"># FastAPI 版本（自動驗證）</span>
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI
+<span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel
+<span class="keyword">from</span> typing <span class="keyword">import</span> Optional
+
+app = FastAPI()
+
+<span class="keyword">class</span> UserCreate(BaseModel):
+    username: <span class="keyword">str</span>
+    email: <span class="keyword">str</span>
+    password: <span class="keyword">str</span>
+    age: Optional[<span class="keyword">int</span>] = <span class="keyword">None</span>
+
+<span class="keyword">@app</span>.post(<span class="string">"/users/"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> create_user(user: UserCreate):
+    <span class="comment"># 在此處 user 已經是驗證過的 UserCreate 實例</span>
+    <span class="keyword">return</span> {<span class="string">"msg"</span>: <span class="string">"用戶創建成功"</span>, <span class="string">"user"</span>: user.dict()}
+</div>
+            
+            <div class="code-block">
+<span class="comment"># Flask 版本（需手動驗證）</span>
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request, jsonify
+
+app = Flask(__name__)
+
+<span class="keyword">@app</span>.post(<span class="string">"/users/"</span>)
+<span class="keyword">def</span> create_user():
+    data = request.get_json()
+    <span class="comment"># 需要手動驗證所有欄位</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> data.get(<span class="string">'username'</span>) or <span class="keyword">not</span> data.get(<span class="string">'email'</span>):
+        <span class="keyword">return</span> jsonify({<span class="string">"error"</span>: <span class="string">"Missing required fields"</span>}), <span class="number">400</span>
+    
+    <span class="comment"># 額外驗證 email 格式、密碼強度等...</span>
+    <span class="keyword">return</span> jsonify({<span class="string">"msg"</span>: <span class="string">"用戶創建成功"</span>})
+</div>
+            
+            <div class="verdict-box">
+                <h2 class="verdict-title">選擇建議</h2>
+                
+                <div class="verdict-content">
+                    <div class="verdict-item">
+                        <h3>🚀 選擇 FastAPI 時</h3>
+                        <p>您應該選擇 FastAPI 如果：</p>
+                        <ul>
+                            <li>建構高效能 API 或微服務</li>
+                            <li>需要自動生成的互動式 API 文件</li>
+                            <li>重視類型安全和開發工具支援（IDE 自動補全、錯誤檢查）</li>
+                            <li>應用大量異步 I/O 操作（如數據庫查詢、HTTP 請求）</li>
+                            <li>團隊熟悉 Python 類型提示和現代開發實踐</li>
+                            <li>希望減少樣板代碼，專注於業務邏輯</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="verdict-item">
+                        <h3>🔧 選擇 Flask 時</h3>
+                        <p>您應該選擇 Flask 如果：</p>
+                        <ul>
+                            <li>需要最大的靈活性和控制權</li>
+                            <li>團隊對 Flask 已有豐富經驗</li>
+                            <li>建構傳統多頁面 Web 應用（博客、新聞站等）</li>
+                            <li>需要特定的成熟擴展（如 Flask-Admin、Flask-Security 等）</li>
+                            <li>專案複雜度不高，開發速度不是主要考量</li>
+                            <li>進行教學或演示，需要簡單易理解的範例</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <h2>結論</h2>
+            <p>FastAPI 和 Flask 各有千秋，沒有絕對的「更好」選擇。關鍵在於根據具體的專案需求、團隊背景和長期維護考量來做出決定。</p>
+            
+            <p><strong>當您需要：</strong></p>
+            <ul>
+                <li>現代化、高效能的 API 開發 → <span class="highlight">選擇 FastAPI</span></li>
+                <li>靈活性和擴展選擇優先 → <span class="highlight">選擇 Flask</span></li>
+                <li>團隊學習成本和快速原型 → <span class="highlight">兩者皆可，依團隊熟悉度而定</span></li>
+                <li>長期項目和代碼維護性 → <span class="highlight">FastAPI 類型安全優勢明顯</span></li>
+            </ul>
+            
+            <p>無論您選擇哪個框架，重要的是理解其設計哲學和最佳實踐。兩個框架都能幫助您建構出色的 Web 應用，選擇最適合您具體情境的那一個。</p>
+        </div>
+        
+        <footer>
+            © 2026 Porsche哥. All rights reserved.
+        </footer>
+    </div>
+</body>
+</html>

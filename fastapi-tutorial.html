@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI 完整教學 - Porsche哥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #00ffff;
+            text-decoration: none;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .article-header {
+            border-left: 4px solid #00ffff;
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .article-header h1 {
+            font-size: 2.5em;
+            color: #00ffff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            margin-bottom: 15px;
+        }
+        
+        .article-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .content h2 {
+            color: #ff00ff;
+            font-size: 1.6em;
+            margin: 30px 0 15px 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .content h2:first-child {
+            margin-top: 0;
+        }
+        
+        .content h3 {
+            color: #00ffff;
+            font-size: 1.3em;
+            margin: 25px 0 12px 0;
+        }
+        
+        .content p {
+            margin-bottom: 20px;
+            color: #a0a0a0;
+        }
+        
+        .content ul {
+            margin: 20px 0 20px 30px;
+            color: #a0a0a0;
+        }
+        
+        .content li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .tech-box {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-box p {
+            margin-bottom: 0;
+            color: #00ffff;
+        }
+        
+        .code-block {
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.5;
+            white-space: pre;
+        }
+        
+        .code-block .comment {
+            color: #666;
+            display: block;
+            margin: 8px 0;
+        }
+        
+        .code-block .string {
+            color: #ff99ff;
+        }
+        
+        .code-block .keyword {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .code-block .number {
+            color: #ff9900;
+        }
+        
+        .code-block .function {
+            color: #ffff00;
+        }
+        
+        .command-block {
+            background: #0f0f1a;
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.6;
+        }
+        
+        .command-block .comment {
+            color: #666;
+            display: block;
+            margin: 10px 0 6px 0;
+        }
+        
+        .command-block .command {
+            color: #ffff00;
+            font-weight: bold;
+            display: block;
+            margin: 6px 0;
+        }
+        
+        .warning-box {
+            background: rgba(255, 100, 100, 0.1);
+            border: 1px solid #ff6666;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .warning-box p {
+            color: #ff9999;
+            margin-bottom: 0;
+        }
+        
+        .tip-box {
+            background: rgba(100, 255, 100, 0.1);
+            border: 1px solid #66ff66;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tip-box p {
+            color: #66ff66;
+            margin-bottom: 0;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← 回到首頁</a>
+        
+        <div class="article-header">
+            <h1>FastAPI 完整教學</h1>
+            <p class="article-meta">由 Porsche哥 編寫 • 2026年4月6日</p>
+        </div>
+        
+        <div class="content">
+            <h2>什麼是 FastAPI？</h2>
+            <p>FastAPI 是一個現代、快速（高效能）的 Python Web 框架，用於構建 API（應用程式介面），基於標準 Python 類型提示。</p>
+            
+            <div class="tech-box">
+                <p>FastAPI 的主要特色：</p>
+                <ul>
+                    <li><strong>極高效能：</strong> 速度比肩 NodeJS 和 Go（歸功於 Starlette 和 Pydantic）</li>
+                    <li><strong>快速開發：</strong> 功能開發速度提升 200% 到 300%</li>
+                    <li><strong>少量錯誤：</strong> 透過類型提示減少約 40% 的人為錯誤</li>
+                    <li><strong>內建文件：</strong> 自動生成互動式 API 文件（Swagger UI、ReDoc）</li>
+                    <li><strong>標準基礎：</strong> 基於完全標準的 Python 類型提示</li>
+                </ul>
+            </div>
+            
+            <h2>為什麼選擇 FastAPI？</h2>
+            <p>在現代微服務和雲原生應用中，FastAPI 提供了以下優勢：</p>
+            <ul>
+                <li><strong>異步支援：</strong> 原生支援 async/await，適合高併發場景</li>
+                <li><strong>類型安全：</strong> 基於 Pydantic 的資料驗證和序列化</li>
+                <li><strong>依賴注入：</strong> 強大而直觀的依賴注入系統</li>
+                <li><strong>安全性：</strong> 內建認證和授權工具</li>
+                <li><strong>測試友善：</strong> 基於 Starlette，測試非常簡單</li>
+            </ul>
+            
+            <h2>安裝與設置</h2>
+            
+            <div class="code-block">
+<span class="comment"># 安裝 FastAPI 和伺服器</span>
+pip install fastapi
+pip install uvicorn[standard]
+            </div>
+            
+            <h2>你的第一個 FastAPI 應用</h2>
+            
+            <div class="code-block">
+<span class="comment"># 創建 main.py</span>
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI
+
+app = FastAPI()
+
+<span class="keyword">@app</span>.get(<span class="string">"/"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> read_root():
+    <span class="keyword">return</span> {<span class="string">"Hello"</span>: <span class="string">"World"</span>}
+</div>
+            
+            <div class="code-block">
+<span class="comment"># 運行應用</span>
+uvicorn main:app --reload
+            </div>
+            
+            <p>訪問 <a href="http://localhost:8000" style="color: #00ffff;">http://localhost:8000</a> 將看到 {"Hello": "World"}</p>
+            <p>自動文件地址：<a href="http://localhost:8000/docs" style="color: #00ffff;">http://localhost:8000/docs</a> (Swagger UI)</p>
+            <p>替代文件：<a href="http://localhost:8000/redoc" style="color: #00ffff;">http://localhost:8000/redoc</a> (ReDoc)</p>
+            
+            <h2>路由參數和查詢參數</h2>
+            
+            <div class="code-block">
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI
+<span class="keyword">from</span> typing <span class="keyword">import</span> Optional
+
+app = FastAPI()
+
+<span class="keyword">@app</span>.get(<span class="string">"/items/{item_id}"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> read_item(item_id: <span class="keyword">int</span>, q: Optional[<span class="keyword">str</span>] = <span class="keyword">None</span>):
+    <span class="keyword">return</span> {<span class="string">"item_id"</span>: item_id, <span class="string">"q"</span>: q}
+</div>
+            
+            <h2>請求體（Request Body）</h2>
+            
+            <div class="code-block">
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI
+<span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel
+<span class="keyword">from</span> typing <span class="keyword">import</span> Optional
+
+app = FastAPI()
+
+<span class="keyword">class</span> Item(BaseModel):
+    name: <span class="keyword">str</span>
+    description: Optional[<span class="keyword">str</span>] = <span class="keyword">None</span>
+    price: <span class="keyword">float</span>
+    tax: Optional[<span class="keyword">float</span>] = <span class="keyword">None</span>
+
+<span class="keyword">@app</span>.post(<span class="string">"/items/"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> create_item(item: Item):
+    <span class="keyword">return</span> item
+</div>
+            
+            <h2>依賴注入</h2>
+            
+            <div class="code-block">
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI, Depends, HTTPException
+<span class="keyword">from</span> typing <span class="keyword">import</span> Annotated
+
+app = FastAPI()
+
+<span class="keyword">def</span> get_query_param(q: str | <span class="keyword">None</span> = <span class="keyword">None</span>):
+    <span class="keyword">return</span> q
+
+<span class="keyword">@app</span>.get(<span class="string">"/items/"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> read_items(query: Annotated[str, Depends(get_query_param)]):
+    <span class="keyword">return</span> {<span class="string">"query"</span>: query}
+</div>
+            
+            <h2>異步操作</h2>
+            
+            <div class="code-block">
+<span class="keyword">import</span> asyncio
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI
+
+app = FastAPI()
+
+<span class="keyword">@app</span>.get(<span class="string">"/"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> read_root():
+    <span class="comment"># 模擬異步 I/O 操作</span>
+    <span class="keyword">await</span> asyncio.sleep(<span class="number">0.1</span>)
+    <span class="keyword">return</span> {<span class="string">"message"</span>: <span class="string">"Hello World"</span>}
+</div>
+            
+            <h2>錯誤處理</h2>
+            
+            <div class="code-block">
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI, HTTPException
+<span class="keyword">from</span> typing <span class="keyword">import</span> Dict
+
+app = FastAPI()
+
+items = {
+    <span class="string">"foo"</span>: {<span class="string">"name"</span>: <span class="string">"Foo Fighters"</span>},
+    <span class="string">"bar"</span>: {<span class="string">"name"</span>: <span class="string">"Bar Bar"</span>}
+}
+
+<span class="keyword">@app</span>.get(<span class="string">"/items/{item_id}"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> read_item(item_id: str):
+    <span class="keyword">if</span> item_id <span class="keyword">not</span> <span class="keyword">in</span> items:
+        <span class="keyword">raise</span> HTTPException(status_code=<span class="number">404</span>, detail=<span class="string">"Item not found"</span>)
+    <span class="keyword">return</span> items[item_id]
+</div>
+            
+            <h2>CORS 中介軟體</h2>
+            
+            <div class="code-block">
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI
+<span class="keyword">from</span> fastapi.middleware.cors <span class="keyword">import</span> CORSMiddleware
+
+app = FastAPI()
+
+<span class="comment"># 設定 CORS</span>
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[<span class="string">"*"</span>],  # 在生產環境中應該指定具體域名
+    allow_credentials=<span class="keyword">True</span>,
+    allow_methods=[<span class="string">"*"</span>],
+    allow_headers=[<span class="string">"*"</span>],
+)
+
+<span class="keyword">@app</span>.get(<span class="string">"/"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> read_root():
+    <span class="keyword">return</span> {<span class="string">"message"</span>: <span class="string">"Hello World"</span>}
+</div>
+            
+            <h2>進階功能</h2>
+            
+            <h3>WebSocket 支援</h3>
+            <div class="code-block">
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI, WebSocket
+<span class="keyword">from</span> typing <span class="keyword">import</span> List
+
+app = FastAPI()
+
+<span class="keyword">class</span> ConnectionManager:
+    <span class="keyword">def</span> __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    <span class="keyword">async</span> <span class="keyword">def</span> connect(self, websocket: WebSocket):
+        <span class="keyword">await</span> websocket.accept()
+        self.active_connections.append(websocket)
+
+    <span class="keyword">def</span> disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    <span class="keyword">async</span> <span class="keyword">def</span> send_personal_message(self, message: str, websocket: WebSocket):
+        <span class="keyword">await</span> websocket.send_text(message)
+
+    <span class="keyword">async</span> <span class="keyword">def</span> broadcast(self, message: str):
+        <span class="keyword">for</span> connection <span class="keyword">in</span> self.active_connections:
+            <span class="keyword">await</span> connection.send_text(message)
+
+manager = ConnectionManager()
+
+<span class="keyword">@app</span>.get(<span class="string">"/"</span>)
+<span class="keyword">def</span> get():
+    <span class="keyword">return</span> <span class="string">"<h1>Hello World</h1>"</span>
+
+<span class="keyword">@app</span>.websocket(<span class="string">"/ws/{client_id}"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> websocket_endpoint(websocket: WebSocket, client_id: <span class="keyword">int</span>):
+    <span class="keyword">await</span> manager.connect(websocket)
+    <span class="keyword">try</span>:
+        <span class="keyword">while</span> <span class="keyword">True</span>:
+            data = <span class="keyword">await</span> websocket.receive_text()
+            <span class="keyword">await</span> manager.send_personal_message(f<span class="string">"You wrote: {data}"</span>, websocket)
+            <span class="keyword">await</span> manager.broadcast(f<span class="string">"Client #{client_id} says: {data}"</span>)
+    <span class="keyword">except</span>:
+        manager.disconnect(websocket)
+</div>
+            
+            <h3>背景任務</h3>
+            <div class="code-block">
+<span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI, BackgroundTasks
+<span class="keyword">from</span> typing <span class="keyword">import</span> Dict
+
+app = FastAPI()
+
+<span class="keyword">def</span> write_notification(email: str, message: str = <span class="string">""</span>):
+    <span class="keyword">with</span> <span class="keyword">open</span>(<span class="string">"log.txt"</span>, <span class="string">"mode"</span>) as email_file:
+        content = f<span class="string">"notification for {email}: {message}"</span>
+        email_file.write(content)
+
+<span class="keyword">@app</span>.post(<span class="string">"/send-notification/{email}"</span>)
+<span class="keyword">async</span> <span class="keyword">def</span> send_notification(email: str, background_tasks: BackgroundTasks):
+    background_tasks.add_task(write_notification, email, message=<span class="string">"Hello from FastAPI!"</span>)
+    <span class="keyword">return</span> {<span class="string">"message"</span>: <span class="string">"Notification sent in the background"</span>}
+</div>
+            
+            <h2>部署與生產環境</h2>
+            
+            <div class="tip-box">
+                <p>生產環境部署建議：</p>
+                <ul>
+                    <li>使用 Gunicorn 與 Uvicorn 工作器：<code>gunicorn -k uvicorn.workers.UvicornWorker main:app</code></li>
+                    <li>設定適當的工作器數量：通常為 (2 x CPU核心數) + 1</li>
+                    <li>使用過程管理器如 Supervisor 或 systemd</li>
+                    <li>設定日誌輪轉和監控</li>
+                    <li>使用反向代理如 Nginx</li>
+                </ul>
+            </div>
+            
+            <h2>結語</h2>
+            <p>FastAPI 代表了現代 Python Web 框架的發展方向，結合了高效能、開發效率和現代特性。無論是建構微服務、建立內部工具，或是創建公開的 API，FastAPI 都是一個優秀的選擇。</p>
+            <p>隨著其生態系統的成長和社群的擴大，FastAPI 正在成為構建高品質 Python 應用的標準選擇之一。</p>
+            
+            <div class="warning-box">
+                <p>💡 學習建議：從簡單的 CRUD API 開始練習，逐步探索依賴注入、異步操作和進階功能。實踐是學習 FastAPI 的最佳方式！</p>
+            </div>
+        </div>
+        
+        <footer>
+            © 2026 Porsche哥. All rights reserved.
+        </footer>
+    </div>
+</body>
+</html>

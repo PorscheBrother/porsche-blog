@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask 完整教學 - Porsche哥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #00ffff;
+            text-decoration: none;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .article-header {
+            border-left: 4px solid #00ffff;
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .article-header h1 {
+            font-size: 2.5em;
+            color: #00ffff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            margin-bottom: 15px;
+        }
+        
+        .article-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .content h2 {
+            color: #ff00ff;
+            font-size: 1.6em;
+            margin: 30px 0 15px 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .content h2:first-child {
+            margin-top: 0;
+        }
+        
+        .content h3 {
+            color: #00ffff;
+            font-size: 1.3em;
+            margin: 25px 0 12px 0;
+        }
+        
+        .content p {
+            margin-bottom: 20px;
+            color: #a0a0a0;
+        }
+        
+        .content ul {
+            margin: 20px 0 20px 30px;
+            color: #a0a0a0;
+        }
+        
+        .content li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .tech-box {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-box p {
+            margin-bottom: 0;
+            color: #00ffff;
+        }
+        
+        .code-block {
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.5;
+            white-space: pre;
+        }
+        
+        .code-block .comment {
+            color: #666;
+            display: block;
+            margin: 8px 0;
+        }
+        
+        .code-block .string {
+            color: #ff99ff;
+        }
+        
+        .code-block .keyword {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .code-block .number {
+            color: #ff9900;
+        }
+        
+        .code-block .function {
+            color: #ffff00;
+        }
+        
+        .command-block {
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.6;
+        }
+        
+        .command-block .comment {
+            color: #666;
+            display: block;
+            margin: 10px 0 6px 0;
+        }
+        
+        .command-block .command {
+            color: #ffff00;
+            font-weight: bold;
+            display: block;
+            margin: 6px 0;
+        }
+        
+        .warning-box {
+            background: rgba(255, 100, 100, 0.1);
+            border: 1px solid #ff6666;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .warning-box p {
+            color: #ff9999;
+            margin-bottom: 0;
+        }
+        
+        .tip-box {
+            background: rgba(100, 255, 100, 0.1);
+            border: 1px solid #66ff66;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tip-box p {
+            color: #66ff66;
+            margin-bottom: 0;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← 回到首頁</a>
+        
+        <div class="article-header">
+            <h1>Flask 完整教學</h1>
+            <p class="article-meta">由 Porsche哥 編寫 • 2026年4月6日</p>
+        </div>
+        
+        <div class="content">
+            <h2>什麼是 Flask？</h2>
+            <p>Flask 是一個輕量級的 Python Web 框架，基於 Werkzeug 工具箱和 Jinja2 模板引擎。它被設計為易於上手且易於擴展，適合建構小型到中型的 Web 應用。</p>
+            
+            <div class="tech-box">
+                <p>Flask 的主要特色：</p>
+                <ul>
+                    <li><strong>簡單易學：</strong> 极簡核心，易於理解和使用</li>
+                    <li><strong>靈活性高：</strong> 不強制特定結構或依賴，開發者有高度自由度</li>
+                    <li><strong>廣泛擴展：</strong> 豐富的擴展生態系統（Flask-Login、Flask-WTF、Flask-SQLAlchemy 等）</li>
+                    <li><strong>內建開發伺服器：</strong> 快速測試和開發</li>
+                    <li><strong>Unicode 支援：</strong> 良好的國際化支援</li>
+                </ul>
+            </div>
+            
+            <h2>為什麼選擇 Flask？</h2>
+            <p>Flask 適用於以下場景：</p>
+            <ul>
+                <li><strong>學習 Web 開發：</strong> 簡單直接，適合初學者理解 Web 基礎概念</li>
+                <li><strong>原型開發：</strong> 快速構建 MVP 和概念驗證</li>
+                <li><strong>小型應用：</strong> 個人網站、部落格、內部工具</li>
+                <li><strong>微服務：</strong> 作為輕量級 API 服務</li>
+                <li><strong>教育用途：</strong> 教學和演示 Web 開發概念</li>
+            </ul>
+            
+            <h2>安裝與設置</h2>
+            
+            <div class="code-block">
+<span class="comment"># 安裝 Flask</span>
+pip install flask
+            </div>
+            
+            <h2>你的第一個 Flask 應用</h2>
+            
+            <div class="code-block">
+<span class="comment"># 創建 app.py</span>
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask
+
+app = Flask(__name__)
+
+<span class="keyword">@app</span>.route(<span class="string">"/"</span>)
+<span class="keyword">def</span> hello():
+    <span class="keyword">return</span> <span class="string">"Hello, World!"</span>
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    app.run(debug=<span class="keyword">True</span>)
+</div>
+            
+            <div class="code-block">
+<span class="comment"># 運行應用</span>
+python app.py
+</div>
+            
+            <p>訪問 <a href="http://localhost:5000" style="color: #00ffff;">http://localhost:5000</a> 將看到 "Hello, World!"</p>
+            
+            <h2>路由和視圖函數</h2>
+            
+            <div class="code-block">
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask, render_template, request, redirect, url_for
+
+app = Flask(__name__)
+
+<span class="keyword">@app</span>.route(<span class="string">"/"</span>)
+<span class="keyword">def</span> index():
+    <span class="keyword">return</span> <span class="string">"<h1>歡迎來到我的網站</h1>"</span>
+
+<span class="keyword">@app</span>.route(<span class="string">"/about"</span>)
+<span class="keyword">def</span> about():
+    <span class="keyword">return</span> <span class="string">"<h1>關於我們</h1><p>這是關於我們的頁面</p>"</span>
+
+<span class="keyword">@app</span>.route(<span class="string">"/user/<username>"</span>)
+<span class="keyword">def</span> show_user_profile(username):
+    <span class="keyword">return</span> f<span class="string">'User: {username}'</span>
+
+<span class="keyword">@app</span>.route(<span class="string">"/post/<int:post_id>"</span>)
+<span class="keyword">def</span> show_post(post_id):
+    <span class="keyword">return</span> f<span class="string">'Post {post_id}'</span>
+
+<span class="keyword">@app</span>.route(<span class="string">"/login"</span>, methods=['GET', 'POST'])
+<span class="keyword">def</span> login():
+    <span class="keyword">if</span> request.method == 'POST':
+        <span class="keyword">return</span> <span class="string">"登入處理"</span>
+    <span class="keyword">return</span> '''
+        <form method="post">
+            <input type="text" name="username" placeholder="使用者名稱">
+            <input type="password" name="password" placeholder="密碼">
+            <button type="submit">登入</button>
+        </form>
+    '''
+</div>
+            
+            <h2>模板引擎 Jinja2</h2>
+            
+            <p>Flask 使用 Jinja2 作為模板引擎，允許在 HTML 中嵌入 Python 語法。</p>
+            
+            <div class="code-block">
+<span class="comment"># app.py 中的路由</span>
+<span class="keyword">@app</span>.route(<span class="string">"/"</span>)
+<span class="keyword">def</span> home():
+    user = <span class="string">"Porsche哥"</span>
+    posts = [<span class="string">"第一篇文章"</span>, <span class="string">"第二篇文章"</span>, <span class="string">"第三篇文章"</span>]
+    <span class="keyword">return</span> render_template(<span class="string">'index.html'</span>, user=user, posts=posts)
+</div>
+            
+            <div class="code-block">
+<span class="comment"># templates/index.html</span>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-TW"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;{{ user }} 的網站&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;歡迎，{{ user }}！&lt;/h1&gt;
+    
+    &lt;h2&gt;我的文章&lt;/h2&gt;
+    &lt;ul&gt;
+        {% for post in posts %}
+            &lt;li&gt;{{ post }}&lt;/li&gt;
+        {% endfor %}
+    &lt;/ul&gt;
+    
+    &lt;!-- 條件判斷 --&gt;
+    {% if user == "Porsche哥" %}
+        &lt;p&gt;你好，站長！&lt;/p&gt;
+    {% else %}
+        &lt;p&gt;你好，訪客！&lt;/p&gt;
+    {% endif %}
+    
+    &lt;!-- 包含其他模板 --&gt;
+    {% include 'header.html' %}
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+            
+            <h2>靜態文件</h2>
+            
+            <p>Flask 自動提供 /static 路徑來服務靜態文件（CSS、JavaScript、圖片等）。</p>
+            
+            <div class="code-block">
+<span class="comment"># 目錄結構</span>
+yourproject/
+├── app.py
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   └── script.js
+│   └── images/
+│       └── logo.png
+└── templates/
+    ├── index.html
+    └── about.html
+</div>
+            
+            <div class="code-block">
+<span class="comment"># 在模板中使用靜態文件</span>
+&lt;link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"&gt;
+&lt;img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo"&gt;
+&lt;script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</div>
+            
+            <h2>表單處理與驗證</h2>
+            
+            <p>Flask 本身不包含表單處理，但常配合 Flask-WTF 使用。</p>
+            
+            <div class="code-block">
+<span class="comment"># 安裝 Flask-WTF</span>
+pip install flask-wtf
+</div>
+            
+            <div class="code-block">
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask, render_template, redirect, url_for, flash
+<span class="keyword">from</span> flask_wtf <span class="keyword">import</span> FlaskForm
+<span class="keyword">from</span> wtforms <span class="keyword">import</span> StringField, PasswordField, SubmitField
+<span class="keyword">from</span> wtforms.validators <span class="keyword">import</span> DataRequired, Length, EqualTo
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = <span class="string">'your-secret-key-here'</span>
+
+<span class="keyword">class</span> LoginForm(FlaskForm):
+    username = StringField(<span class="string">'使用者名稱'</span>, validators=[DataRequired(), Length(min=4, max=25)])
+    password = PasswordField(<span class="string">'密碼'</span>, validators=[DataRequired()])
+    submit = SubmitField(<span class="string">'登入'</span>)
+
+<span class="keyword">@app</span>.route(<span class="string">"/login"</span>, methods=['GET', 'POST'])
+<span class="keyword">def</span> login():
+    form = LoginForm()
+    <span class="keyword">if</span> form.validate_on_submit():
+        flash(<span class="string">'登入成功！'</span>, <span class="string">'success'</span>)
+        <span class="keyword">return</span> redirect(url_for(<span class="string">'index'</span>))
+    <span class="keyword">return</span> render_template(<span class="string">'login.html'</span>, form=form)
+</div>
+            
+            <h2>資料庫整合</h2>
+            
+            <p>Flask 常用 SQLAlchemy 來處理資料庫操作。</p>
+            
+            <div class="code-block">
+<span class="comment"># 安裝相關套件</span>
+pip install flask-sqlalchemy
+</div>
+            
+            <div class="code-block">
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask
+<span class="keyword">from</span> flask_sqlalchemy <span class="keyword">import</span> SQLAlchemy
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = <span class="string">'sqlite:///site.db'</span>
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = <span class="keyword">False</span>
+
+db = SQLAlchemy(app)
+
+<span class="keyword">class</span> User(db.Model):
+    id = db.Column(db.Integer, primary_key=<span class="keyword">True</span>)
+    username = db.Column(db.String(<span class="number">20</span>), unique=<span class="keyword">True</span>, nullable=<span class="keyword">False</span>)
+    email = db.Column(db.String(<span class="number">120</span>), unique=<span class="keyword">True</span>, nullable=<span class="keyword">False</span>)
+    password = db.Column(db.String(<span class="number">60</span>), nullable=<span class="keyword">False</span>)
+
+    <span class="keyword">def</span> __repr__(self):
+        <span class="keyword">return</span> f<span class="string">"User('{self.username}', '{self.email}')"</span>
+</div>
+            
+            <h2>RESTful API 開發</h2>
+            
+            <p>Flask 可以輕鬆建構 RESTful API。</p>
+            
+            <div class="code-block">
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask, jsonify, request
+<span class="keyword">from</span> flask_sqlalchemy <span class="keyword">import</span> SQLAlchemy
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = <span class="string">'sqlite:///items.db'</span>
+db = SQLAlchemy(app)
+
+<span class="keyword">class</span> Item(db.Model):
+    id = db.Column(db.Integer, primary_key=<span class="keyword">True</span>)
+    name = db.Column(db.String(<span class="number">80</span>), nullable=<span class="keyword">False</span>)
+    description = db.Column(db.String(<span class="number">200</span>))
+
+<span class="comment"># 建立資料表</span>
+<span class="keyword">with</span> app.app_context():
+    db.create_all()
+
+<span class="comment"># GET 所有項目</span>
+<span class="keyword">@app</span>.route(<span class="string">"/api/items"</span>, methods=['GET'])
+<span class="keyword">def</span> get_items():
+    items = Item.query.all()
+    <span class="keyword">return</span> jsonify([{
+        'id': item.id,
+        'name': item.name,
+        'description': item.description
+    } <span class="keyword">for</span> item <span class="keyword">in</span> items])
+
+<span class="comment"># GET 單個項目</span>
+<span class="keyword">@app</span>.route(<span class="string">"/api/items/&lt;int:item_id&gt;"</span>, methods=['GET'])
+<span class="keyword">def</span> get_item(item_id):
+    item = Item.query.get_or_404(item_id)
+    <span class="keyword">return</span> jsonify({
+        'id': item.id,
+        'name': item.name,
+        'description': item.description
+    })
+
+<span class="comment"># POST 建立新項目</span>
+<span class="keyword">@app</span>.route(<span class="string">"/api/items"</span>, methods=['POST'])
+<span class="keyword">def</span> create_item():
+    data = request.get_json()
+    new_item = Item(name=data['name'], description=data.get('description', ''))
+    db.session.add(new_item)
+    db.session.commit()
+    <span class="keyword">return</span> jsonify({'id': new_item.id}), <span class="number">201</span>
+
+<span class="comment"># PUT 更新項目</span>
+<span class="keyword">@app</span>.route(<span class="string">"/api/items/&lt;int:item_id&gt;"</span>, methods=['PUT'])
+<span class="keyword">def</span> update_item(item_id):
+    item = Item.query.get_or_404(item_id)
+    data = request.get_json()
+    item.name = data.get('name', item.name)
+    item.description = data.get('description', item.description)
+    db.session.commit()
+    <span class="keyword">return</span> jsonify({'id': item.id})
+
+<span class="comment"># DELETE 刪除項目</span>
+<span class="keyword">@app</span>.route(<span class="string">"/api/items/&lt;int:item_id&gt;"</span>, methods=['DELETE'])
+<span class="keyword">def</span> delete_item(item_id):
+    item = Item.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    <span class="keyword">return</span> '', <span class="number">204</span>
+</div>
+            
+            <h2>錯誤處理</h2>
+            
+            <div class="code-block">
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask, render_template
+
+app = Flask(__name__)
+
+<span class="keyword">@app</span>.errorhandler(<span class="number">404</span>)
+<span class="keyword">def</span> not_found_error(error):
+    <span class="keyword">return</span> render_template(<span class="string">'404.html'</span>), <span class="number">404</span>
+
+<span class="keyword">@app</span>.errorhandler(<span class="number">500</span>)
+<span class="keyword">def</span> internal_error(error):
+    db.session.rollback()
+    <span class="keyword">return</span> render_template(<span class="string">'500.html'</span>), <span class="number">500</span>
+</div>
+            
+            <h2>應用工廠模式</h2>
+            
+            <p>對於較大的應用，建議使用應用工廠模式來提升可組織性和可測試性。</p>
+            
+            <div class="code-block">
+<span class="comment"># project/__init__.py</span>
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask
+<span class="keyword">from</span> flask_sqlalchemy <span class="keyword">import</span> SQLAlchemy
+
+db = SQLAlchemy()
+
+<span class="keyword">def</span> create_app():
+    app = Flask(__name__)
+    app.config.from_object(<span class="string">'config.Config'</span>)
+    
+    db.init_app(app)
+    
+    <span class="comment"># 註冊藍圖</span>
+    <span class="keyword">from</span> .routes <span class="keyword">import</span> main_bp
+    app.register_blueprint(main_bp)
+    
+    <span class="keyword">return</span> app
+</div>
+            
+            <div class="code-block">
+<span class="comment"># project/routes.py</span>
+<span class="keyword">from</span> flask <span class="keyword">import</span> Blueprint, render_template
+
+main_bp = Blueprint('main', __name__)
+
+<span class="keyword">@main_bp</span>.route(<span class="string">"/"</span>)
+<span class="keyword">def</span> index():
+    <span class="keyword">return</span> render_template(<span class="string">'index.html'</span>)
+</div>
+            
+            <div class="code-block">
+<span class="comment"># run.py</span>
+<span class="keyword">from</span> project <span class="keyword">import</span> create_app
+
+app = create_app()
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    app.run(debug=<span class="keyword">True</span>)
+</div>
+            
+            <h2>部署與生產環境</h2>
+            
+            <div class="tip-box">
+                <p>生產環境部署建議：</p>
+                <ul>
+                    <li>使用 Gunicorn 或 uWSGI 作為 WSGI 伺服器</li>
+                    <li>設定適當的工作進程數</li>
+                    <li>使用過程管理器如 Supervisor 或 systemd</li>
+                    <li>設定日誌輪轉和監控</li>
+                    <li>使用反向代理如 Nginx</li>
+                    <li>啟用適當的安全標頭（CSP、HSTS 等）</li>
+                    <li>設定環境變數來管理配置</li>
+                </ul>
+            </div>
+            
+            <div class="code-block">
+<span class="comment"># 使用 Gunicorn 部署</span>
+gunicorn -w 4 -b 0.0.0.0:8000 app:app
+</div>
+            
+            <h2>Flask vs FastAPI 比較</h2>
+            
+            <div class="tech-box">
+                <h3>⚡ 效能比較</h3>
+                <p>FastAPI 通常比 Flask 快 2-3 倍，特別是在異步操作和高併發場景下。</p>
+            </div>
+            
+            <div class="tech-box">
+                <h3>📚 學習曲線</h3>
+                <p>Flask 更簡單直觀，適合初學者；FastAPI 需要理解 Python 類型提示和異步概念。</p>
+            </div>
+            
+            <div class="tech-box">
+                <h3>🔧 特色功能</h3>
+                <p>Flask: 成熟生態系統、靈活性高、廣泛採用<br>FastAPI: 自動文件、類型安全、異步支援、依賴注入</p>
+            </div>
+            
+            <div class="tech-box">
+                <h3>🎯 使用場景建議</h3>
+                <p><strong>選擇 Flask 時：</strong><br>
+                - 需要最大靈活性和控制權<br>
+                - 團隊對 Flask 已有經驗<br>
+                - 建構傳統多頁面應用<br>
+                - 需要廣泛的擴展選擇<br><br>
+                <strong>選擇 FastAPI 時：</strong><br>
+                - 建構高效能 API 或微服務<br>
+                - 需要自動生成的互動式文件<br>
+                - 重視類型安全和開發工具支援<br>
+                - 應用大量異步 I/O 操作
+                </p>
+            </div>
+            
+            <h2>結語</h2>
+            <p>Flask 作為 Python Web 框架的經典選擇，以其簡潔、靈活和成熟的生態系統贏得了廣泛的採用。無論是學習 Web 開發、建構個人專案，或是開發企業級應用，Flask 都提供了一個堅實的基礎。</p>
+            <p>雖然 FastAPI 在效能和現代特性上具有優勢，但 Flask 的簡單性和廣泛適用性使其在許多場景下仍然是優秀的選擇。選擇哪個框架應該基於具體的專案需求、團隊經驗和長期維護考量。</p>
+            
+            <div class="warning-box">
+                <p>💡 學習建議：從基本的路由和模板開始練習，逐步探索表單處理、資料庫整合和API開發。實際專案練習是掌握 Flask 的最佳途徑。</p>
+            </div>
+        </div>
+        
+        <footer>
+            © 2026 Porsche哥. All rights reserved.
+        </footer>
+    </div>
+</body>
+</html>
