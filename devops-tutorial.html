@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps 完整教學 - Porsche哥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #00ffff;
+            text-decoration: none;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .article-header {
+            border-left: 4px solid #00ffff;
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .article-header h1 {
+            font-size: 2.5em;
+            color: #00ffff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            margin-bottom: 15px;
+        }
+        
+        .article-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .content h2 {
+            color: #ff00ff;
+            font-size: 1.6em;
+            margin: 30px 0 15px 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .content h2:first-child {
+            margin-top: 0;
+        }
+        
+        .content h3 {
+            color: #00ffff;
+            font-size: 1.3em;
+            margin: 25px 0 12px 0;
+        }
+        
+        .content p {
+            margin-bottom: 20px;
+            color: #a0a0a0;
+        }
+        
+        .content ul {
+            margin: 20px 0 20px 30px;
+            color: #a0a0a0;
+        }
+        
+        .content li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .tech-box {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-box p {
+            margin-bottom: 0;
+            color: #00ffff;
+        }
+        
+        .code-block {
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.5;
+            white-space: pre;
+        }
+        
+        .code-block .comment {
+            color: #666;
+            display: block;
+            margin: 8px 0;
+        }
+        
+        .code-block .string {
+            color: #ff99ff;
+        }
+        
+        .code-block .keyword {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .code-block .number {
+            color: #ff9900;
+        }
+        
+        .code-block .function {
+            color: #ffff00;
+        }
+        
+        .command-block {
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.6;
+        }
+        
+        .command-block .comment {
+            color: #666;
+            display: block;
+            margin: 10px 0 6px 0;
+        }
+        
+        .command-block .command {
+            color: #ffff00;
+            font-weight: bold;
+            display: block;
+            margin: 6px 0;
+        }
+        
+        .warning-box {
+            background: rgba(255, 100, 100, 0.1);
+            border: 1px solid #ff6666;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .warning-box p {
+            color: #ff9999;
+            margin-bottom: 0;
+        }
+        
+        .tip-box {
+            background: rgba(100, 255, 100, 0.1);
+            border: 1px solid #66ff66;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tip-box p {
+            color: #66ff66;
+            margin-bottom: 0;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← 回到首頁</a>
+        
+        <div class="article-header">
+            <h1>DevOps 完整教學</h1>
+            <p class="article-meta">由 Porsche哥 編寫 • 2026年4月6日</p>
+        </div>
+        
+        <div class="content">
+            <h2>什麼是 DevOps？</h2>
+            <p>DevOps 是一種文化哲學、實踐和工具的結合，旨在提高組織交付應用程式和服務的能力，使其能夠以更高的速度演進和改進產品，比使用傳統軟體開發和基礎設施管理流程更快。</p>
+            
+            <div class="tech-box">
+                <p>DevOps 核心價值：</p>
+                <ul>
+                    <li><strong>合作：</strong> 打破開發和運維之間的隔閡</li>
+                    <li><strong>自動化：</strong> 自動化重複性任務以提高效率</li>
+                    <li><strong>持續改進：</strong> 持續監控、測量和優化</li>
+                    <li><strong>以客戶為中心：</strong> 快速響應客戶需求和市場變化</li>
+                </ul>
+            </div>
+            
+            <h2>DevOps 的演變</h2>
+            <p>DevOps 沒有從虛無中誕生，而是從軟體開發演化過程中自然產生的：</p>
+            <ul>
+                <li><strong>瀑布模型：</strong> 順序性開發，變更緩慢</li>
+                <li><strong>敏捷開發：</strong> 迭代開發，但開發和運維仍然分離</li>
+                <li><strong>DevOps：</strong> 開發、測試、運維全程合作與自動化</li>
+                <li><strong>Site Reliability Engineering (SRE)：</strong> Google 開發的，將軟體工程應用於基礎設施問題</li>
+            </ul>
+            
+            <h2>DevOps 核心概念</h2>
+            
+            <h3>1. 持續整合與持續交付 (CI/CD)</h3>
+            <p>CI/CD 是 DevOps 的核心實踐，通過自動化構建、測試和部署流程來快速、可靠地交付軟體變更。</p>
+            
+            <div class="code-block">
+<span class="comment"># 基本 CI/CD 流程示例（使用 GitHub Actions）</span>
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: Lint with flake8
+      run: |
+        # 斷開執行以便在失敗時顯示所有錯誤
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    - name: Test with pytest
+      run: |
+        pytest
+    
+    - name: Build and push Docker image
+      run: |
+        docker build . -t myapp:${{ github.sha }}
+        echo "Image built"
+</div>
+            
+            <h3>2. 基礎設施即代碼 (Infrastructure as Code, IaC)</h3>
+            <p>透過程式碼來管理和佈署基礎設施，而不是手動配置硬體和作業系統。</p>
+            
+            <div class="code-block">
+<span class="comment"># Terraform 示例：建立 AWS EC2 執行個體</span>
+provider "aws" {
+  region = "us-west-2"
+}
+
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "hello-world"
+  }
+}
+</div>
+            
+            <div class="code-block">
+<span class="comment"># AWS CloudFormation 示例（YAML）</span>
+Resources:
+  MyEC2Instance:
+    Type: "AWS::EC2::Instance"
+    Properties: 
+      ImageId: "ami-0ff8a91507f77f867"
+      InstanceType: t2.micro
+      Tags:
+        - Key: "Name"
+          Value: "MyInstance"
+</div>
+            
+            <h3>3. 監控與日誌</h3>
+            <p>有效的監控和日誌記錄是理解系統行為、故障排除和效能優化的關鍵。</p>
+            
+            <div class="tech-box">
+                <p>監控三大支柱：</p>
+                <ul>
+                    <li><strong>指標 (Metrics)：</strong> 數值型資料，如 CPU 使用率、記憶體消耗</li>
+                    <li><strong>日誌 (Logs)：</strong> 離散事件記錄，如錯誤訊息、使用者操作</li>
+                    <li><strong>追蹤 (Traces)：</strong> 分佈式系統中請求的路徑資訊</li>
+                </ul>
+            </div>
+            
+            <div class="code-block">
+<span class="comment"># Prometheus 指標範例</span>
+# HELP http_requests_total The total number of HTTP requests.
+# TYPE http_requests_total counter
+http_requests_total{method="post",code="200"} 1027
+http_requests_total{method="get",code="200"} 2338
+</div>
+            
+            <h3>4. 微服務與容器化</h3>
+            <p>DevOps 與微服務架構和容器技術密切相關，因為它們共同啟用了快速的開發和部署週期。</p>
+            
+            <div class="code-block">
+<span class="comment"># Dockerfile 示例</span>
+FROM node:14
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD [ "node", "server.js" ]
+</div>
+            
+            <div class="code-block">
+<span class="comment"># docker-compose.yml 示例</span>
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+     - "5000:5000"
+  redis:
+    image: "redis:alpine"
+</div>
+            
+            <h2>DevOps 工具鏈</h2>
+            
+            <div class="tech-box">
+                <p>常見 DevOps 工具按功能分類：</p>
+            </div>
+            
+            <div class="code-block">
+<span class="comment"># 版本控制</span>
+Git, SVN, Mercurial
+
+<span class="comment"># 持續整合</span>
+Jenkins, GitLab CI, GitHub Actions, CircleCI, Travis CI
+
+<span class="comment"># 配置管理</span>
+Ansible, Chef, Puppet, SaltStack
+
+<span class="comment"># 基礎設施即代碼</span>
+Terraform, AWS CloudFormation, Azure Resource Manager, Google Deployment Manager
+
+<span class="comment"># 容器 orchestration</span>
+Kubernetes, Docker Swarm, Apache Mesos
+
+<span class="comment"># 監控與日誌</span>
+Prometheus, Grafana, ELK Stack (Elasticsearch, Logstash, Kibana), Datadog, New Relic
+
+<span class="comment"># 協作與專案管理</span>
+Jira, Confluence, Slack, Microsoft Teams
+</div>
+            
+            <h2>DevOps 最佳實踐</h2>
+            
+            <div class="tip-box">
+                <p>成功實施 DevOps 的關鍵實踐：</p>
+            </div>
+            
+            <div class="code-block">
+<span class="comment"># 1. 從小處著手，但要思考宏大</span>
+# 從一個小專案或服務開始實踐 DevOps 原則
+# 證明價值後再擴展到整個組織
+
+<span class="comment"># 2. 自動化一切可自動化的事情</span>
+# 建置、測試、部署、基礎設施佈署、監控告警
+# 目標是讓人類專注於創造性工作而非重複性任務
+
+<span class="comment"># 3. 實施持續反饋循環</span>
+# 從監控中獲得見解並快速回饋給開發團隊
+# 使用蓝绿部署或金丝雀发布降低風险
+
+<span class="comment"># 4. 培養協作文化</span>
+# 打破 silos，鼓勵跨職能團隊合作
+# 共享目標和責任，而非各自為政
+
+<span class="comment"># 5. 以度量驅動改進</span>
+# 定義關鍵績效指標 (KPIs) 並持續追蹤
+# 例如：部署頻率、變更前置時間、平均復原時間、變更失敗率
+</div>
+            
+            <h2>DevOps 與雲端運算</h2>
+            <p>雲端運算為 DevOps 提供了理想的平台，因為它提供了：</p>
+            <ul>
+                <li><strong>即時資源佈署：</strong> 透過 API 快速取得計算資源</li>
+                <li><strong>彈性伸縮：</strong> 根據負載自動調整資源規模</li>
+                <li><strong>管理服務：</strong> 減輕運維負擔，專注於業務邏輯</li>
+                <li><strong>全球佈署：</strong> 易於在多個地理位置佈署應用</li>
+            </ul>
+            
+            <h2>學習路線與資源</h2>
+            
+            <div class="tip-box">
+                <p>🎯 DevOps 學習建議路線：</p>
+            </div>
+            
+            <div class="code-block">
+<span class="comment"># 第一階段：基礎知識</span>
+# 學習 Linux 基礎、網路概念、腳本語言 (Bash/Python)
+# 理解軟體開發生命週期 (SDLC)
+
+<span class="comment"># 第二階段：工具熟練</span>
+# 精通一個版本控制系統 (Git)
+# 學習一個 CI/CD 工具 (Jenkins 或 GitHub Actions)
+# 熟悉一個配置管理工具 (Ansible)
+# 初探容器化 (Docker) 和 orchestration (Kubernetes)
+
+<span class="comment"># 第三階段：實踐整合</span>
+# 建立完整的 CI/CD pipeline
+# 使用 IaC 管理基礎設施
+# 實施監控和日誌解決方案
+# 參與真實的生產環境維護
+
+<span class="comment"># 第四階段：專業深化</span>
+# 學習雲端平台 (AWS/Azure/GCP)
+# 深入微服務架構和服務網格
+# 探索進階觀測性 (Observability) 技術
+# 獲得相關認證 (例如：AWS DevOps Engineer, Docker Certified, CKA)
+</div>
+            
+            <div class="tip-box">
+                <p>📚 推薦學習資源：</p>
+                <ul>
+                    <li><strong>書籍：</strong>《The Phoenix Project》、《Accelerate》、《Site Reliability Engineering》</li>
+                    <li><strong>線上課程：</strong> Coursera、Udemy、edX 上的 DevOps 專業證書課程</li>
+                    <li><strong>實作平台：</strong> Katacoda, Play with Docker, Killercoda</li>
+                    <li><strong>社群：</strong> DevOpsDays 會議, DevOps subreddit, 專業論壇</li>
+                    <li><strong>工具文件：</strong> 官方文件始終是最佳起點</li>
+                </ul>
+            </div>
+            
+            <h2>結語</h2>
+            <p>DevOps 不僅是一套工具或一套流程，更重要的是一種文化和心態的轉變。它要求組織打破傳統的部門牆，培養共同負責產品全生命週期的思維方式。</p>
+            <p>隨著技術的快速演進，DevOps 將繼續發展和適應新的挑戰和機遇。無論您是開發人員、系統管理員，還是想要進入這個領域的新手，理解和實踐 DevOps 原則都將使您在當今的科技產業中具備競爭優勢。</p>
+            <p>記住：DevOps 的旅程是持續改進的旅程。從小處著手，持續學習，不斷迭代和優化您的實踐方式。</p>
+            
+            <div class="warning-box">
+                <p>💡 關鍵提醒：DevOps 不是目的地，而是一段旅程。專注於文化變革和持續改進，而非只是追逐最新的工具或技術。</p>
+            </div>
+        </div>
+        
+        <footer>
+            © 2026 Porsche哥. All rights reserved.
+        </footer>
+    </div>
+</body>
+</html>
