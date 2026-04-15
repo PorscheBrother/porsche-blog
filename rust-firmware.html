@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>從 C 到 Rust：重新定義韌體開發的安全性 - Porsche哥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #00ffff;
+            text-decoration: none;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .article-header {
+            border-left: 4px solid #00ffff;
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .article-header h1 {
+            font-size: 2.5em;
+            color: #00ffff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            margin-bottom: 15px;
+        }
+        
+        .article-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .content h2 {
+            color: #ff00ff;
+            font-size: 1.6em;
+            margin: 30px 0 15px 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .content h2:first-child {
+            margin-top: 0;
+        }
+        
+        .content h3 {
+            color: #00ffff;
+            font-size: 1.3em;
+            margin: 25px 0 12px 0;
+        }
+        
+        .content p {
+            margin-bottom: 20px;
+            color: #a0a0a0;
+        }
+        
+        .content ul {
+            margin: 20px 0 20px 30px;
+            color: #a0a0a0;
+        }
+        
+        .content li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .tech-box {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-box p {
+            margin-bottom: 0;
+            color: #00ffff;
+        }
+        
+        .code-block {
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.5;
+            white-space: pre;
+        }
+        
+        .code-block .comment {
+            color: #666;
+            display: block;
+            margin: 8px 0;
+        }
+        
+        .code-block .keyword {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .code-block .string {
+            color: #ff99ff;
+        }
+        
+        .code-block .function {
+            color: #ffff00;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← 回到首頁</a>
+        
+        <div class="article-header">
+            <h1>從 C 到 Rust：重新定義韌體開發的安全性</h1>
+            <p class="article-meta">由 Porsche哥 編寫 • 2026年4月16日</p>
+        </div>
+        
+        <div class="content">
+            <h2>韌體開發的「禁區」：為什麼 C 語言讓工程師頭痛？</h2>
+            <p>在韌體 (Firmware) 與嵌入式系統的世界裡，C 語言統治了數十年。它的直接、高效、對硬體的絕對控制力使其成為唯一選擇。然而，這種「絕對控制」也帶來了巨大的風險。</p>
+            <p>韌體開發中最常見的噩夢莫過於：<span class="highlight">空指標 (Null Pointer)</span>、<span class="highlight">緩衝區溢位 (Buffer Overflow)</span> 以及難以捉摸的 <span class="highlight">競態條件 (Race Condition)</span>。在伺服器上，這些錯誤可能導致程式崩潰；但在韌體中，這可能意味著設備死機、硬體損毀，甚至在工業控制場景中導致嚴重的安全事故。</p>
+            
+            <div class="tech-box">
+                <p>韌體開發的核心挑戰：</p>
+                <ul>
+                    <li><strong>極限資源：</strong> 記憶體可能只有幾 KB，沒有 OS，沒有虛擬記憶體</li>
+                    <li><strong>硬體直接操作：</strong> 需要頻繁地讀寫特定記憶體位址 (MMIO)</li>
+                    <li><strong>高可靠性要求：</strong> 設備一旦部署，更新成本極高 (OTA 失敗可能導致 brick)</li>
+                    <li><strong>併發壓力：</strong> 中斷處理 (Interrupts) 帶來的異步操作極易產生 Bug</li>
+                </ul>
+            </div>
+            
+            <h2>Rust 如何在「裸機」上生存？</h2>
+            <p>很多人認為 Rust 依賴於強大的標準庫 (std)，但在韌體開發中，我們面對的是 <span class="highlight">no_std</span> 環境。這意味著我們放棄了 `Vec`, `String` 等需要動態記憶體分配的工具，回歸到最純粹的靜態記憶體管理。</p>
+            
+            <h3>1. 零成本抽象 (Zero-Cost Abstractions)</h3>
+            <p>Rust 的核心承諾是：你使用的高級特性不會增加額外的運行時開銷。在韌體中，這意味著你可以使用強型別、泛型和特質 (Traits)，而最終生成的機器碼與手寫的 C 語言一樣精簡。</p>
+            
+            <h3>2. 型別安全的暫存器操作</h3>
+            <p>在 C 語言中，操作暫存器通常是將一個記憶體位址強制轉換為指標並寫入。而在 Rust 中，我們可以使用 <span class="highlight">PAC (Peripheral Access Crate)</span>，將暫存器封裝成強型別。如果你嘗試向一個唯讀暫存器寫入，或者寫入不合法的位元組合，編譯器會在編譯階段就直接報錯。</p>
+            
+            <h3>3. 徹底解決中斷競態</h3>
+            <p>這是 Rust 在韌體開發中最強大的武器。通過所有權系統，Rust 可以確保在同一時間，只有一個執行路徑（例如主迴圈或某個中斷處理程序）能持有某個週邊設備的寫入權限。這在根源上消除了大多數韌體中最難除錯的併發 Bug。</p>
+            
+            <div class="code-block">
+                <span class="comment">// 概念性 Rust 嵌入式代碼</span>
+                <span class="keyword">#[no_std]</span>
+                <span class="keyword">#[entry]</span>
+                <span class="keyword">fn</span> <span class="function">main</span>() -> ! {
+                    <span class="keyword">let</span> peripherals = Peripherals::<Current>::take().unwrap();
+                    <span class="keyword">let</span> mut led = peripherals.GPIO_A.pa5.into_push_pull_output();
+                    
+                    <span class="keyword">loop</span> {
+                        led.set_high();
+                        delay(1000);
+                        led.set_low();
+                        delay(1000);
+                    }
+                }
+            </div>
+            
+            <h2>Rust vs. C：韌體工程師的抉擇</h2>
+            <p>並不意味著 C 語言失效了，但在現代韌體開發中，Rust 提供了完全不同的維度：</p>
+            
+            <ul>
+                <li><span class="highlight">開發速度：</span> 雖然學習曲線陡峭，但一旦通過編譯，除錯時間大幅縮短</li>
+                <li><span class="highlight">維護成本：</span> 強型別系統使得重構代碼變得安全，不再擔心改動一處導致另一處隨機崩潰</li>
+                <li><span class="highlight">安全性：</span> 內建的記憶體安全保證，讓韌體能抵禦大部分類型的記憶體攻擊</li>
+            </ul>
+            
+            <h2>實作路徑：如何開始 Embedded Rust？</h2>
+            <p>如果你想嘗試將 Rust 引入你的硬體項目，建議遵循以下路徑：</p>
+            <ol>
+                <li><strong>選擇硬體：</strong> 從 STM32, ESP32 或 nRF 系列開始，這些平台有相對成熟的 Rust 支持</li>
+                <li><strong>學習-no_std：</strong> 理解為什麼不能使用 `std`，以及如何使用 `core` 庫</li>
+                <li><strong>掌握 HAL：</strong> 學習如何使用 Hardware Abstraction Layer 來操作 GPIO, SPI, I2C</li>
+                <li><strong>探索 RTIC：</strong> 嘗試使用 <span class="highlight">RTIC (Real-Time Interrupt-driven Concurrency)</span> 框架，實現高效且安全的異步處理</li>
+            </ol>
+            
+            <h2>結語</h2>
+            <p>韌體開發不應該是一場「祈禱程式不要崩潰」的賭博。Rust 的出現將安全性從「工程師的自律」提升到了「語言級別的強制」。</p>
+            <p>對於 Porsche哥 來說，追求極致的效能與絕對的精準是一致的。而 Rust 在韌體上的應用，正是這種哲學的完美體現：<strong>在最底層的硬體之上，構建最可靠的數位靈魂。</strong></p>
+        </div>
+        
+        <footer>
+            © 2026 Porsche哥. All rights reserved.
+        </footer>
+    </div>
+</body>
+</html>
