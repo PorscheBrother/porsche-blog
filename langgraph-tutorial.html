@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph 深度解析：構建具有狀態與循環的 AI Agent 工作流 - Porsche哥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #00ffff;
+            text-decoration: none;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .article-header {
+            border-left: 4px solid #00ffff;
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .article-header h1 {
+            font-size: 2.5em;
+            color: #00ffff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            margin-bottom: 15px;
+        }
+        
+        .article-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .content h2 {
+            color: #ff00ff;
+            font-size: 1.6em;
+            margin: 30px 0 15px 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .content h2:first-child {
+            margin-top: 0;
+        }
+        
+        .content h3 {
+            color: #00ffff;
+            font-size: 1.3em;
+            margin: 25px 0 12px 0;
+        }
+        
+        .content p {
+            margin-bottom: 20px;
+            color: #a0a0a0;
+        }
+        
+        .content ul {
+            margin: 20px 0 20px 30px;
+            color: #a0a0a0;
+        }
+        
+        .content li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .tech-box {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-box p {
+            margin-bottom: 0;
+            color: #00ffff;
+        }
+        
+        .code-block {
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            line-height: 1.5;
+            white-space: pre;
+        }
+        
+        .code-block .comment {
+            color: #666;
+            display: block;
+            margin: 8px 0;
+        }
+        
+        .code-block .keyword {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .code-block .string {
+            color: #ff99ff;
+        }
+        
+        .code-block .function {
+            color: #ffff00;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← 回到首頁</a>
+        
+        <div class="article-header">
+            <h1>LangGraph 深度解析：構建具有狀態與循環的 AI Agent 工作流</h1>
+            <p class="article-meta">由 Porsche哥 編寫 • 2026年4月28日</p>
+        </div>
+        
+        <div class="content">
+            <h2>從 Linear Chain 到 Cyclic Graph：AI 的進化</h2>
+            <p>如果你使用過 LangChain，你一定熟悉所謂的「鏈 (Chain)」。鏈的邏輯是線性的：輸入 $\rightarrow$ 步驟 A $\rightarrow$ 步驟 B $\rightarrow$ 輸出。這在簡單的 RAG 或翻譯任務中表現良好。</p>
+            <p>但在面對複雜的 <span class="highlight">Agentic Workflows (代理工作流)</span> 時，線性結構就失效了。真正的智能需要「循環 (Loops)」—— AI 執行一個動作，觀察結果，發現錯誤，然後回到上一步重新修正。這就是 <span class="highlight">LangGraph</span> 存在的意義。</p>
+            <p>LangGraph 將 LLM 應用視為一個 <span class="highlight">有向圖 (Directed Graph)</span>，讓你可以精確定義狀態的流轉與反饋循環，將 AI 從簡單的對話框轉化為能夠自我修正的自動化系統。</p>
+            
+            <div class="tech-box">
+                <p>LangGraph 核心概念：</p>
+                <ul>
+                    <li><strong>State (狀態)：</strong> 全局共享的記憶體，記錄目前進度與數據 (例如：已搜尋的關鍵字、目前的草稿)</li>
+                    <li><strong>Nodes (節點)：</strong> 具備邏輯的函數。接收 State $\rightarrow$ 執行動作 $\rightarrow$ 更新 State</li>
+                    <li><strong>Edges (邊)：</strong> 定義節點之間的轉移路徑</li>
+                    <li><strong>Conditional Edges (條件邊)：</strong> 根據 LLM 的判斷決定下一步去哪裡 (例如：如果結果不滿意 $\rightarrow$ 回到搜尋節點)</li>
+                </ul>
+            </div>
+            
+            <h2>LangGraph 實戰教學：構建一個「自我修正」的寫作助理</h2>
+            <p>假設我們要構建一個助理，流程是：<span class="highlight">搜尋資訊 $\rightarrow$ 撰寫草稿 $\rightarrow$ 審查品質 $\rightarrow$ (若不合格) $\rightarrow$ 重新撰寫</span>。</p>
+            
+            <h3>第一步：定義 State</h3>
+            <p>State 是 Graph 的靈魂。它定義了所有節點之間傳遞的數據結構。</p>
+            <div class="code-block">
+                <span class="keyword">from</span> typing <span class="keyword">import</span> TypedDict, List
+
+                <span class="keyword">class</span> <span class="function">AgentState</span>(TypedDict):
+                    <span class="string">"messages"</span>: List[str]
+                    <span class="string">"draft"</span>: str
+                    <span class="string">"critique"</span>: str
+                    <span class="string">"iterations"</span>: <span class="keyword">int</span>
+            </div>
+            
+            <h3>第二步：定義 Nodes (邏輯單元)</h3>
+            <p>每個節點就是一個簡單的 Python 函數，負責處理狀態。</p>
+            <div class="code-block">
+                <span class="keyword">def</span> <span class="function">writer_node</span>(state: AgentState):
+                    <span class="comment">// 使用 LLM 根據訊息撰寫草稿</span>
+                    draft = llm.invoke(<span class="string">"請撰寫關於...的文章"</span>)
+                    <span class="keyword">return</span> {<span class="string">"draft"</span>: draft, <span class="string">"iterations"</span>: state[<span class="string">"iterations"</span>] + 1}
+
+                <span class="keyword">def</span> <span class="function">critic_node</span>(state: AgentState):
+                    <span class="comment">// 使用 LLM 審查草稿</span>
+                    critique = llm.invoke(<span class="string">"請批評這篇草稿："</span> + state[<span class="string">"draft"</span>])
+                    <span class="keyword">return</span> {<span class="string">"critique"</span>: critique}
+            </div>
+            
+            <h3>第三步：定義圖結構 (Graph)</h3>
+            <p>將節點連接起來，並設定條件跳轉。</p>
+            <div class="code-block">
+                <span class="keyword">from</span> langgraph.graph <span class="keyword">import</span> StateGraph, END
+
+                workflow = StateGraph(AgentState)
+                workflow.add_node(<span class="string">"writer"</span>, writer_node)
+                workflow.add_node(<span class="string">"critic"</span>, critic_node)
+
+                workflow.set_entry_point(<span class="string">"writer"</span>)
+                workflow.add_edge(<span class="string">"writer"</span>, <span class="string">"critic"</span>)
+
+                <span class="comment">// 條件邊：判斷是否需要重新撰寫</span>
+                <span class="keyword">def</span> <span class="function">should_continue</span>(state: AgentState):
+                    <span class="keyword">if</span> <span class="string">"合格"</span> <span class="keyword">in</span> state[<span class="string">"critique"</span>] <span class="keyword">or</span> state[<span class="string">"iterations"</span>] > 3:
+                        <span class="keyword">return</span> END
+                    <span class="keyword">return</span> <span class="string">"writer"</span>
+
+                workflow.add_conditional_edges(<span class="string">"critic"</span>, should_continue)
+                app = workflow.compile()
+            </div>
+            
+            <h2>LangGraph 的核心應用場景</h2>
+            <p>當你需要 AI 具備「思考 $\rightarrow$ 行動 $\rightarrow$ 反思」的閉環能力時，LangGraph 是首選：</p>
+            
+            <ul>
+                <li><span class="highlight">自動化程式碼開發 (Coding Agents)：</span> 寫代碼 $\rightarrow$ 運行測試 $\rightarrow$ 根據錯誤訊息修改代碼 $\rightarrow$ 再次測試。這是目前最頂尖的 AI 寫作工作流。</li>
+                <li><span class="highlight">複雜的客戶支持系統：</span> 根據用戶意圖跳轉到不同專業節點 $\rightarrow$ 獲取外部 API 數據 $\rightarrow$ 檢查答案是否滿足用戶 $\rightarrow$ 回覆。</li>
+                <li><span class="highlight">多代理協作 (Multi-Agent Collaboration)：</span> 定義多個節點（如：產品經理、工程師、測試員），讓他們在圖中流轉，互相審核對方的產出。</li>
+                <li><span class="highlight">研究報告生成：</strong> 規劃大綱 $\rightarrow$ 分段搜尋 $\rightarrow$ 整合內容 $\rightarrow$ 檢查邏輯漏洞 $\rightarrow$ 補全缺失資訊。</li>
+            </ul>
+            
+            <h2>總結：掌控 AI 的邏輯流</h2>
+            <p>LangGraph 的本質是將 <span class="highlight">控制權</span> 從 LLM 的隨機生成，交還給開發者。我們不再只是祈禱 LLM 能一次給出正確答案，而是通過構建嚴謹的狀態圖，強迫 AI 在正確的邏輯路徑上運行。</p>
+            <p>如果你想讓你的 AI 助理從「會聊天」變成「能工作」，學習 LangGraph 是必經之路。記住：最強大的 AI 不是最強的模型，而是最精巧的工作流。直接、高效、有邏輯，這才是 Porsche哥 的開發之道。</p>
+        </div>
+        
+        <footer>
+            © 2026 Porsche哥. All rights reserved.
+        </footer>
+    </div>
+</body>
+</html>
